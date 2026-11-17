@@ -1,0 +1,15 @@
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Node (if you ever run npx serve etc.)
+node_modules/
+npm-debug.log*
+
+# Python cache from _tools/make-heroes.py
+__pycache__/
+*.pyc
