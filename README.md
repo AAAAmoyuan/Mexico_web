@@ -102,7 +102,10 @@ Turn this product photo into a transparent-background product image: remove the 
 2. **点「使用 GitHub 登录」报错、或提示没权限？** 说明这个 GitHub 账号还没被加成仓库协作者，找管理员加。
 3. **图片上传后没显示？** 检查格式（PNG）、大小（1 MB 以内），然后 `Ctrl + F5`。
 4. **两个人一起改会打架吗？** 不会报错，但同一条内容以最后保存的为准；建议不同时改同一屏。
-5. **改坏了想退回？** 让我帮你看仓库的提交记录，可以回滚到任意一次保存之前。
+5. **改了样式/页面结构看不到变化？** CSS 和 JS 文件名不变，浏览器可能还留着旧文件；
+   按 `Ctrl + Shift + R` 强制刷新一次。以后改样式时把 `index.html` 里 `style.css?v=2` 的
+   `v=2` 改成 `v=3` 就能让所有访客立刻拿到新文件。
+6. **改坏了想退回？** 让我帮你看仓库的提交记录，可以回滚到任意一次保存之前。
 
 ---
 
@@ -156,6 +159,19 @@ npx decap-server                    # 另开一个终端，后台免登录编辑
    - `GITHUB_CLIENT_SECRET`（**Secret**）
 3. 换域名时：`admin/config.yml` 里 `base_url`、`site_url`、`display_url` 三处，加上 OAuth App 的
    callback 地址要一起改
+
+### 缓存策略
+
+`_headers` 里分区设置，别再把 CSS/JS 设成长期缓存（文件名不变，改了用户看不到）：
+
+| 路径 | Cache-Control | 原因 |
+|---|---|---|
+| `/assets/css/*`、`/assets/js/*` | `max-age=0, must-revalidate` | 文件名固定，必须每次校验 |
+| `/assets/img/*` | `max-age=31536000, immutable` | 后台换图会生成新文件名 |
+| `/content/*` | `max-age=0, must-revalidate` | 后台改的字要立刻生效 |
+| `/admin/*` | `no-store` | 后台不能缓存 |
+
+改 CSS/JS 后如果想让已缓存的老访客立刻更新，把 `index.html` 里的 `?v=2` 递增一位。
 
 ### 注意
 

@@ -3,11 +3,19 @@
   Cache-Control: no-store, must-revalidate
   X-Robots-Tag: noindex, nofollow
 
-# 文案数据：每次访问都回源校验，保证后台改完刷新就能看到
+# 文案数据：每次访问都回源校验，后台改完刷新就能看到
 /content/*
   Cache-Control: public, max-age=0, must-revalidate
 
-/assets/*
+# CSS / JS：文件名不会变，所以不能长期缓存，否则改了样式用户看不到
+/assets/css/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/js/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 图片：内容不会原地变（后台换图会生成新文件名），可以长期缓存
+/assets/img/*
   Cache-Control: public, max-age=31536000, immutable
 
 /index.html
