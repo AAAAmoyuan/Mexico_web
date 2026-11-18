@@ -1,141 +1,164 @@
-# Cloudflare 静态站 — JUESHITUO 手机壳落地页
+# Robin 网站 · 使用与维护说明
 
-单页静态站（纯 HTML/CSS/JS，无构建步骤），部署在 Cloudflare Workers 静态资源上，
-并带一个 Decap CMS 后台供不懂代码的同事维护文案。
+一页三屏的落地页：**第 1 屏手机壳 → 第 2 屏手机膜 → 第 3 屏联系方式**（聊天卡片 + 二维码 + 一键拨号）。
 
-## 目录
+| | 地址 |
+|---|---|
+| 官网 | https://mexico-web.luyonghuang.workers.dev |
+| 后台 | https://mexico-web.luyonghuang.workers.dev/admin/ |
 
-```
-index.html              页面结构（文案已改为可被后台覆盖，默认值仍写在这里）
-content/site.json       ★ 所有文案和图片 —— 后台改的就是这个文件
-admin/                  Decap CMS 后台（/admin/）
-admin/config.yml        后台表单定义（哪个字段对应哪段文字、中文标签）
-src/worker.js           Cloudflare Worker：静态资源 + GitHub OAuth 登录代理
-wrangler.jsonc          Worker 部署配置（name / main / assets）
-.assetsignore           不随站点上传的仓库文件
-assets/css/style.css    样式
-assets/js/content.js    读取 content/site.json 并填充页面
-assets/js/main.js       轮播 / 顶栏 / 入场动画
-assets/img/             hero 背景、产品图、卖点图
-assets/img/uploads/     后台后台上传的新图片会进这里
-_headers                缓存与安全头（Workers 静态资源同样支持）
-robots.txt
-_tools/make-heroes.py   可选：重新生成 hero 背景图（需要 Pillow）
-_preview/               本地预览截图（上传时可删）
-手机壳/                 你提供的原始竖图（源素材，可删）
-```
+改文字、换图片都在后台网页里点，**不用装软件、不用碰代码**。
 
-## 本地预览
+---
 
-```bash
-python -m http.server 8080
-# 或
-npx serve .
-```
+## 一、进后台（给同事用，不用你的电脑）
 
-打开 http://localhost:8080（不要直接双击 index.html，用 http 服务更接近线上）。
+后台是云端网页，谁在自己电脑或手机上登录都一样 —— 你电脑关掉也不影响他们改。
 
-后台在 http://localhost:8080/admin/ 。
+**第一次给某个同事开权限，做两件事：**
 
-## 内容管理后台（Decap CMS）
+1. 让对方注册一个 GitHub 账号（免费，2 分钟）：https://github.com/signup
+2. 你把对方加成仓库协作者：GitHub 仓库 → **Settings → Collaborators → Add people**，输入他的 GitHub 用户名
+   对方会收到邮件邀请，点同意即可
 
-不懂代码的同事打开 `https://你的域名/admin/`，用 GitHub 账号登录，就能改文字和换图；
-保存后会自动提交到仓库，Cloudflare Workers 随后自动重新部署，一两分钟后线上生效。
+**之后他自己操作：**
+
+1. 浏览器打开 https://mexico-web.luyonghuang.workers.dev/admin/
+2. 点「使用 GitHub 登录」→ 授权
+3. 左侧「网站内容 → 首页」，右边就是表单
+4. 改完点右上角 **Publish**，等 1～2 分钟刷新官网就能看到
 
 ![后台编辑界面](_preview/cms-admin.png)
 
-### 工作原理
+> 每次保存都以**他自己的 GitHub 身份**提交，谁改了什么在仓库的 commit 记录里一清二楚。
+> 两个人同时改不冲突：后保存的会覆盖前面的同一条内容。
+
+---
+
+## 二、换图片
+
+| 页面位置 | 后台字段 | 规格 |
+|---|---|---|
+| 第 1 屏 产品图 | 第 1 屏 · 手机壳 → 产品图 | 1200×1600 PNG，透明底或白底，1 MB 以内 |
+| 第 2 屏 产品图 | 第 2 屏 · 手机膜 → 产品图 | 同上 |
+| 第 3 屏 二维码 | 第 3 屏 · 联系方式 → 二维码图片 | 600×600 PNG，黑白、四周留白 |
+
+上传的新图会存进 `assets/img/uploads/`，**不会覆盖原来的图**；想换回去，把字段里的路径改回
+`/assets/img/case-product.png` 就行。
+
+图片内容要求：产品**完整、居中**，四周留 5~10% 空白，不要带文字、水印、边框、多余道具。
+尺寸比例差一点页面也不会坏，只是会多一点留白。
+
+### AI 生图提示词（把手机拍的图变成 1200×1600 透明底）
 
 ```
-/admin/ (Decap CMS)  --OAuth-->  /api/auth · /api/callback (src/worker.js)
-        |                                    |
-        |  读写 content/site.json            |  换取 GitHub token
-        v                                    v
-     GitHub 仓库  ---------------------->  GitHub OAuth App
-        |
-        |  push 触发 Workers Builds
-        v
-   Cloudflare Worker  ->  线上页面（content.js 用 JSON 填充文案）
+把这张产品图做成电商主图：去掉背景，改成完全透明底；只保留产品本身，产品完整、居中，四周留出约 8% 的透明空白；输出竖版 3:4、1200×1600 像素；保持产品的颜色、材质、光影和细节不变；不要添加任何文字、水印、阴影、边框或装饰。
 ```
 
-### 一次性配置（部署后做一次）
+英文版（国外工具用这段）：
 
-1. **Worker 必须连上 GitHub 仓库（Workers Builds）**，否则后台保存后线上不会自动更新。
-   - Worker → Settings → Build → Connect，部署命令填 `npx wrangler deploy`，构建命令留空
-2. **创建一个 GitHub OAuth App**：https://github.com/settings/applications/new
-   - Application name：`Mexico_web CMS`
-   - Homepage URL：你的站点地址
-   - Authorization callback URL：`https://你的域名/api/callback`
-   - 创建后记下 **Client ID**，再 Generate a new client secret 拿到 **Client Secret**
-3. **在 Worker 里加环境变量**（Settings → Variables and Secrets）：
-   - `GITHUB_CLIENT_ID`（明文）
-   - `GITHUB_CLIENT_SECRET`（类型选 Secret）
-   - 加完重新部署一次
-4. **换自定义域名时**，同步改 `admin/config.yml` 里 `base_url` / `site_url` /
-   `display_url` / `logo_url` 四处，以及 OAuth App 的 callback 地址
-5. **给编辑者开权限**：GitHub 仓库 → Settings → Collaborators → Add people
-   对方需要一个 GitHub 账号，并接受邀请。Decap 的 GitHub 后端是按仓库写权限控制访问的。
+```
+Turn this product photo into a transparent-background product image: remove the background completely, keep only the product, fully visible and centered with about 8% empty transparent margin, portrait 3:4 at 1200×1600 px, preserve the exact colors, materials, lighting and details. Do not add text, watermark, shadow, border or decorations.
+```
 
-### 编辑者怎么用
+做不出透明底也没关系：**白底 1200×1600 的 PNG 一样能用**（版块本来就是白底）。
 
-1. 打开 `https://你的域名/admin/`，点「使用 GitHub 登录」授权
-2. 左侧「网站内容 → 首页文案」，右侧按分区修改文字
-3. 点右上角 **Publish** 保存，等 1-2 分钟线上生效
+---
 
-### 本地调试后台
+## 三、改文字
+
+后台里从上到下就是页面从上到下的顺序：
+
+| 后台分区 | 改的是 |
+|---|---|
+| 品牌 → 品牌名 | 左上角 `Robin` |
+| 顶栏按钮 | 右上角 `Learn More` |
+| 搜索引擎信息 | 浏览器标签页标题、搜索结果简介、分享到 WhatsApp/Facebook 的标题和图 |
+| 第 1 屏 · 手机壳 | 小标题、大标题、副标题、三条卖点、按钮文字、按钮链接、产品图 |
+| 第 2 屏 · 手机膜 | 同上 |
+| 第 3 屏 · 联系方式 | 聊天窗口标题、聊天气泡、打电话按钮、电话号码、二维码、网址、服务时间、页脚版权 |
+
+**填写小贴士**
+
+- **大标题**里想换行就**按回车**，页面会自动换行显示
+- **三条卖点**是「一行一条」，编辑框里敲几行就显示几条
+- **聊天气泡**可以加、可以删；「谁说的」选**对方**就是左边白气泡，选**我**就是右边橙色气泡
+- **电话号码**只填一次（例如 `+52 55 1234 5678`），「Call Now」按钮的拨号链接会自动跟着变
+- 页脚年份会自动更新，不用管
+
+---
+
+## 四、联系方式（第 3 屏）
+
+- 电话：后台「第 3 屏 · 联系方式 → 电话号码」，按钮点了直接拨号
+- 二维码：`600×600 PNG`，扫码打开 `www.f-lexin.com`（网址文字也在后台里改）
+- 服务时间、网址文字都在同一个分区
+
+---
+
+## 五、常见问题
+
+1. **改完刷新没变化？** 后台保存后要等 Cloudflare 重新部署，通常 1～2 分钟。按 `Ctrl + F5` 强制刷新再看。
+2. **点「使用 GitHub 登录」报错、或提示没权限？** 说明这个 GitHub 账号还没被加成仓库协作者，找管理员加。
+3. **图片上传后没显示？** 检查格式（PNG）、大小（1 MB 以内），然后 `Ctrl + F5`。
+4. **两个人一起改会打架吗？** 不会报错，但同一条内容以最后保存的为准；建议不同时改同一屏。
+5. **改坏了想退回？** 让我帮你看仓库的提交记录，可以回滚到任意一次保存之前。
+
+---
+
+## 六、给技术同学
+
+### 结构
+
+```
+index.html              三屏结构（文案默认值写在这里，后台改的内容会覆盖它）
+content/site.json       ★ 后台编辑的数据源
+admin/                  Decap CMS 后台（/admin/）
+admin/config.yml        后台表单定义（中文字段、提示、上传目录）
+src/worker.js           Worker：/api/auth、/api/callback 登录代理，其余交给静态资源
+wrangler.jsonc          Worker 部署配置（main + assets）
+assets/js/content.js    读 content/site.json 并填充页面（JS 失败时用 HTML 里的默认文案）
+assets/js/main.js       顶栏状态、滚动平滑、入场动画、年份
+assets/css/style.css    样式（三屏 100svh + scroll-snap）
+assets/img/             case-product.png / film-product.png / contact-qr.png
+assets/img/uploads/     后台后台上传的新图片
+_headers                缓存与安全头（Workers 静态资源同样支持）
+.assetsignore           不随站点上传的仓库文件
+_preview/               预览截图，不对外
+```
+
+### 本地预览
 
 ```bash
-npx decap-server          # 终端 1：本地编辑代理（config.yml 里 local_backend: true）
-python -m http.server 8080 # 终端 2
+python -m http.server 8080          # 打开 http://localhost:8080
+npx decap-server                    # 另开一个终端，后台免登录编辑本地文件
 ```
 
-打开 http://localhost:8080/admin/ 可直接编辑本地文件，不需要登录。
+### 部署
 
-## 部署到 Cloudflare Workers
+线上是 **Worker + 静态资源**，不是 Pages（Pages Functions 在 Workers 上不执行，所以登录代理写在
+`src/worker.js` 里）。
 
-线上地址：https://mexico-web.luyonghuang.workers.dev
+后台保存 → 提交到 GitHub → Workers 自动重新部署，所以 **Worker 必须连上仓库**：
 
-站点是「Worker + 静态资源」：`wrangler.jsonc` 里的 `main` 是 `src/worker.js`
-（负责 `/api/*` 登录代理），`assets.directory` 是仓库根目录（其余文件原样提供）。
+1. Cloudflare 控制台 → Workers & Pages → `mexico-web` → Settings → Build → Connect
+2. 仓库 `AAAAmoyuan/Mexico_web`，分支 `main`，构建命令留空，**部署命令 `npx wrangler deploy`**
 
-**后台要能更新线上，必须走 Git 部署**，否则 CMS 提交了但网站不会重新发布：
+也可以本机手动发布：`npx wrangler login` 然后 `npx wrangler deploy`。
 
-1. Cloudflare 控制台 → Workers & Pages → 点 `mexico-web` → Settings → Build
-2. Connect 到 `AAAAmoyuan/Mexico_web`，分支 `main`
-3. 构建命令留空，部署命令填 `npx wrangler deploy`
-4. 保存后点一次 Deploy，之后每次 `git push`（包括后台保存产生的提交）都会自动发布
+### 一次性配置（已做完就不用管）
 
-也可以在本机手动发布：
+1. **GitHub OAuth App**：https://github.com/settings/applications/new
+   - Homepage URL：`https://mexico-web.luyonghuang.workers.dev`
+   - Authorization callback URL：`https://mexico-web.luyonghuang.workers.dev/api/callback`
+2. **Worker 变量**（Settings → Variables and Secrets）
+   - `GITHUB_CLIENT_ID`（Text）
+   - `GITHUB_CLIENT_SECRET`（**Secret**）
+3. 换域名时：`admin/config.yml` 里 `base_url`、`site_url`、`display_url` 三处，加上 OAuth App 的
+   callback 地址要一起改
 
-```bash
-npx wrangler login     # 浏览器授权一次
-npx wrangler deploy
-```
+### 注意
 
-> 直接拖拽上传（Upload assets）会让 `/api/auth` 变成 404 —— 那是只有静态文件、
-> 没有 Worker 脚本的部署方式，后台登录不了。
-
-## 图片说明
-
-- `hero-1/2/3`：由 `手机壳/手机壳.webp` 抠图后合成到暗酒红影棚背景，1920×1080；`-mobile` 为 1080×1350 竖版
-- `product-cutout`：抠好的产品图（透明背景），用于产品区
-- `product-main`：原竖图，用于 MagSafe 区块
-- `feature-*.webp`：你提供的 5 张卖点信息图（西语）
-
-替换方法：后台可以直接换产品区和卖点区的图；hero 背景图因为同时有
-`webp` / `jpg` / `-mobile` 三套，目前需要替换文件（保持同名、宽高比一致：hero 16:9、mobile 4:5）。
-
-## 需要你改的地方
-
-- **域名**：目前写死 `https://mexico-web.luyonghuang.workers.dev`，换域名时 `admin/config.yml` 四处
-  加 OAuth App 的 callback 地址要一起改
-- **品牌名 / 购买链接 / 价格文案**：现在都可以在后台改，不用动代码
-- **价格**：页面暂未写价格，需要的话我可以加一行 `$XXX MXN` 或划线价
-
-## 备注
-
-- 顶栏导航 / 轮播 / 懒加载 / 响应式均已实现；hero 支持自动轮播、箭头、圆点、手机滑动
-- 页面语言为西班牙语（`lang="es"`），卖点图自带西语文案，语言统一
-- 首屏轮播固定 3 张、卖点图固定 5 张、兼容性卡片固定 3 张，后台多加的条目不会显示
-- 后台改的文字靠 `assets/js/content.js` 覆盖到页面上；JS 加载失败时页面显示 `index.html` 里的默认文案，不会白屏
-- Apple / iPhone 为 Apple Inc. 商标，页脚已加免责声明
+- 三屏结构固定 3 屏；后台只能改内容，不能加第 4 屏
+- `content/site.json` 里图片路径以 `/` 开头（从站点根目录算），后台选图后自动是 `/assets/img/uploads/...`
+- `.assetsignore` 里的东西（README、_preview、src、wrangler.jsonc 等）不会出现在网站上

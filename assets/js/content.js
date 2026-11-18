@@ -1,10 +1,12 @@
-/* Jump-start content: loads CMS-managed copy from content/site.json and patches the page.
+/* Robin landing page: loads CMS-managed copy from content/site.json and patches the page.
    If the file is missing or invalid, the copy already written in index.html stays visible.
    Mapping rules:
      data-cms="a.b.c"                  -> element textContent = value
      data-cms + data-cms-html          -> innerHTML = escaped value, newlines become <br>
-     data-cms-attr="href:shop.url"     -> set attribute(s), comma separated
-     data-cms-list="product.checks"    -> rebuild <li> list (tag via data-cms-list-tag)
+     data-cms-attr="href:a.link"       -> set attribute(s), comma separated
+     data-cms-list="a.bullets"         -> rebuild <li> list (one item per line)
+     data-cms-tel="a.phone"            -> textContent = number, href = tel:digits
+     data-cms-chat="a.bubbles"         -> rebuild <p class="bubble them|me">
 */
 (function () {
   "use strict";
@@ -71,6 +73,32 @@
         var child = document.createElement(tag);
         child.textContent = text;
         el.appendChild(child);
+      });
+    });
+
+    /* 电话号码：正文元素显示号码，链接元素只更新 tel: 地址（保留按钮文字） */
+    Array.prototype.forEach.call(document.querySelectorAll("[data-cms-tel]"), function (el) {
+      var value = get(data, el.getAttribute("data-cms-tel"));
+      if (typeof value !== "string" || !value) return;
+      if (el.tagName === "A") {
+        el.setAttribute("href", "tel:" + value.replace(/[^0-9+]/g, ""));
+      } else {
+        el.textContent = value;
+      }
+    });
+
+    /* 聊天气泡：格式 [{ from: "them" | "me", text: "..." }] */
+    Array.prototype.forEach.call(document.querySelectorAll("[data-cms-chat]"), function (el) {
+      var list = get(data, el.getAttribute("data-cms-chat"));
+      if (!Array.isArray(list) || !list.length) return;
+      el.textContent = "";
+      list.forEach(function (item) {
+        var text = typeof item === "string" ? item : (item && item.text) || "";
+        if (!text) return;
+        var bubble = document.createElement("p");
+        bubble.className = "bubble " + (item && item.from === "me" ? "me" : "them");
+        bubble.textContent = text;
+        el.appendChild(bubble);
       });
     });
 

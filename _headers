@@ -3,7 +3,7 @@
   Cache-Control: no-store, must-revalidate
   X-Robots-Tag: noindex, nofollow
 
-# 文案数据：每次访问都回源校验，保证编辑后立刻生效
+# 文案数据：每次访问都回源校验，保证后台改完刷新就能看到
 /content/*
   Cache-Control: public, max-age=0, must-revalidate
 

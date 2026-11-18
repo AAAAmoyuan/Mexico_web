@@ -1,6 +1,6 @@
 # =============================================================================
-#  Decap CMS 配置 —— JUESHITUO 落地页
-#  改完这个文件后提交推送，Cloudflare Pages 会自动重新部署。
+#  Decap CMS 配置 —— Robin 落地页
+#  改完这个文件后提交推送，Cloudflare Workers 会自动重新部署。
 # =============================================================================
 
 backend:
@@ -12,22 +12,20 @@ backend:
   base_url: https://mexico-web.luyonghuang.workers.dev
   auth_endpoint: /api/auth
 
-# 本地开发：在本地跑 `npx decap-server` 时可以免登录编辑（生产环境不受影响）
+# 本地开发：跑 `npx decap-server` 时可以免登录编辑（线上不受影响）
 local_backend: true
 
-# 后台界面的站点信息
 site_url: https://mexico-web.luyonghuang.workers.dev
 display_url: https://mexico-web.luyonghuang.workers.dev
-logo_url: https://mexico-web.luyonghuang.workers.dev/assets/img/product-cutout.webp
+logo_url: /assets/img/case-product.png
 
 # 界面语言：zh_Hans = 简体中文；想换成西语改成 es
 locale: zh_Hans
 
-# 上传的图片存放位置
+# 上传的新图片放这里，不会覆盖原有图片
 media_folder: "assets/img/uploads"
 public_folder: "/assets/img/uploads"
 
-# 每次保存自动生成的提交信息
 commit_messages:
   create: "内容更新：新建 {{collection}} {{path}}"
   update: "内容更新：修改 {{collection}} {{path}}"
@@ -37,10 +35,10 @@ collections:
   - name: site
     label: 网站内容
     label_singular: 页面
-    description: 落地页的全部文字和图片
+    description: 三屏落地页的全部文字和图片
     files:
       - name: home
-        label: 首页文案
+        label: 首页
         file: content/site.json
         format: json
         fields:
@@ -50,18 +48,14 @@ collections:
             widget: object
             collapsed: true
             fields:
-              - { label: 品牌名, name: name, widget: string, hint: "顶栏和页脚显示的名字" }
-              - { label: 页脚标语, name: tagline, widget: string }
+              - { label: 品牌名, name: name, widget: string, hint: "顶栏左上角显示的名字" }
 
-          # ---------------- 购买链接 ----------------
-          - label: 购买链接
-            name: shop
+          - label: 顶栏按钮
+            name: nav
             widget: object
             collapsed: true
             fields:
-              - { label: 商品链接, name: url, widget: string, hint: "所有「购买」按钮都会跳到这个地址" }
-              - { label: 按钮文字（顶栏）, name: cta_label_header, widget: string, hint: "右上角那个小按钮" }
-              - { label: 按钮文字（正文）, name: cta_label, widget: string, hint: "首屏和产品区的大按钮" }
+              - { label: 按钮文字, name: cta, widget: string, hint: "默认 Learn More，点击跳到第 3 屏" }
 
           # ---------------- SEO ----------------
           - label: 搜索引擎信息
@@ -70,106 +64,66 @@ collections:
             collapsed: true
             fields:
               - { label: 网页标题, name: title, widget: string, hint: "浏览器标签页显示的文字" }
-              - { label: 网页描述, name: description, widget: text, hint: "搜索结果里显示的简介，建议 150 字以内" }
-              - { label: 分享标题, name: og_title, widget: string, hint: "发到 WhatsApp / Facebook 时显示的标题" }
+              - { label: 网页描述, name: description, widget: text, hint: "搜索结果里的简介，建议 150 字以内" }
+              - { label: 分享标题, name: og_title, widget: string, hint: "发到 WhatsApp / Facebook 时的标题" }
               - { label: 分享描述, name: og_description, widget: text }
               - { label: 分享图片, name: og_image, widget: image, required: false }
 
-          # ---------------- 首屏轮播 ----------------
-          - label: 首屏轮播
-            name: hero
-            widget: object
-            collapsed: true
-            fields:
-              - label: 幻灯片
-                name: slides
-                widget: list
-                hint: "本模板固定 3 张，多出来的不会显示"
-                summary: "{{fields.kicker}} — {{fields.title}}"
-                fields:
-                  - { label: 小标题, name: kicker, widget: string }
-                  - { label: 大标题, name: title, widget: text, hint: "需要换行的地方按回车" }
-                  - { label: 副标题, name: sub, widget: string }
-                  - { label: 按钮文字, name: cta, widget: string }
-
-          # ---------------- 产品区 ----------------
-          - label: 产品区
-            name: product
+          # ---------------- 第 1 屏 ----------------
+          - label: 第 1 屏 · 手机壳
+            name: case
             widget: object
             collapsed: true
             fields:
               - { label: 小标题, name: kicker, widget: string }
-              - { label: 大标题, name: heading, widget: string }
-              - { label: 正文, name: lead, widget: text }
-              - { label: 卖点清单, name: checks, widget: text, hint: "一行一条，显示为打勾列表" }
-              - { label: 价格旁说明, name: price_note, widget: string, hint: "例如：Incluye 1 funda · Garantía 1 año" }
-              - { label: 产品图, name: image, widget: image }
-              - { label: 产品图说明（alt）, name: image_alt, widget: string, hint: "给搜索引擎和读屏软件看的一句话描述" }
+              - { label: 大标题, name: title, widget: text, hint: "需要换行的地方按回车" }
+              - { label: 副标题, name: subtitle, widget: text }
+              - { label: 三条卖点, name: bullets, widget: text, hint: "一行一条，显示为打勾列表" }
+              - { label: 按钮文字, name: cta, widget: string, hint: "默认 Buy Now" }
+              - { label: 按钮链接, name: link, widget: string, hint: "Mercado Libre 商品页地址" }
+              - { label: 产品图, name: image, widget: image, hint: "建议 1200×1600 PNG，透明底或白底" }
+              - { label: 产品图说明（alt）, name: image_alt, widget: string, hint: "给搜索引擎和读屏软件看的一句话" }
 
-          # ---------------- 卖点区 ----------------
-          - label: 卖点区
-            name: features
+          # ---------------- 第 2 屏 ----------------
+          - label: 第 2 屏 · 手机膜
+            name: film
             widget: object
             collapsed: true
             fields:
               - { label: 小标题, name: kicker, widget: string }
-              - { label: 大标题, name: heading, widget: string }
-              - { label: 引言, name: quote, widget: text }
-              - { label: 引言署名, name: quote_by, widget: string }
-              - label: 卖点图
-                name: cards
-                widget: list
-                hint: "固定 5 张，多出来的不会显示"
-                summary: "{{fields.alt}}"
-                fields:
-                  - { label: 图片, name: image, widget: image }
-                  - { label: 图片说明（alt）, name: alt, widget: string }
-
-          # ---------------- MagSafe 区 ----------------
-          - label: MagSafe 区
-            name: magsafe
-            widget: object
-            collapsed: true
-            fields:
-              - { label: 小标题, name: kicker, widget: string }
-              - { label: 大标题, name: heading, widget: string }
-              - { label: 正文, name: lead, widget: text }
-              - { label: 适用场景, name: pills, widget: text, hint: "一行一条，显示为小标签" }
-              - { label: 配图, name: image, widget: image }
-              - { label: 配图说明（alt）, name: image_alt, widget: string }
-
-          # ---------------- 兼容性区 ----------------
-          - label: 兼容性区
-            name: compatibility
-            widget: object
-            collapsed: true
-            fields:
-              - { label: 小标题, name: kicker, widget: string }
-              - { label: 大标题, name: heading, widget: string }
-              - label: 说明卡片
-                name: cards
-                widget: list
-                hint: "固定 3 张，多出来的不会显示"
-                summary: "{{fields.title}}"
-                fields:
-                  - { label: 标题, name: title, widget: string }
-                  - { label: 说明, name: text, widget: text }
-
-          # ---------------- 品牌故事区 ----------------
-          - label: 品牌故事区
-            name: brand_story
-            widget: object
-            collapsed: true
-            fields:
-              - { label: 小标题, name: kicker, widget: string }
-              - { label: 大标题, name: heading, widget: string }
-              - { label: 正文, name: text, widget: text }
+              - { label: 大标题, name: title, widget: text, hint: "需要换行的地方按回车" }
+              - { label: 副标题, name: subtitle, widget: text }
+              - { label: 三条卖点, name: bullets, widget: text, hint: "一行一条，显示为打勾列表" }
               - { label: 按钮文字, name: cta, widget: string }
+              - { label: 按钮链接, name: link, widget: string, hint: "可以先用手机壳的商品页" }
+              - { label: 产品图, name: image, widget: image, hint: "建议 1200×1600 PNG，透明底或白底" }
+              - { label: 产品图说明（alt）, name: image_alt, widget: string }
 
-          # ---------------- 页脚 ----------------
-          - label: 页脚
-            name: footer
+          # ---------------- 第 3 屏 ----------------
+          - label: 第 3 屏 · 联系方式
+            name: contact
             widget: object
             collapsed: true
             fields:
-              - { label: 免责声明, name: disclaimer, widget: text }
+              - { label: 聊天窗口标题, name: chat_title, widget: string, hint: "默认 Robin Support" }
+              - label: 聊天气泡
+                name: bubbles
+                widget: list
+                label_singular: 一条消息
+                summary: "{{fields.text}}"
+                fields:
+                  - label: 谁说的
+                    name: from
+                    widget: select
+                    options:
+                      - { label: 对方（左侧白气泡）, value: them }
+                      - { label: 我（右侧橙气泡）, value: me }
+                  - { label: 内容, name: text, widget: string }
+              - { label: 打电话按钮文字, name: cta, widget: string, hint: "默认 Call Now" }
+              - { label: 电话号码, name: phone, widget: string, hint: "改成 +52 55 1234 5678 这种格式，拨号链接会自动生成" }
+              - { label: 二维码标题, name: qr_title, widget: string }
+              - { label: 二维码图片, name: qr_image, widget: image, hint: "600×600 PNG，黑白、四周留白" }
+              - { label: 二维码说明（alt）, name: qr_alt, widget: string }
+              - { label: 网址, name: website, widget: string }
+              - { label: 服务时间, name: hours, widget: string }
+              - { label: 页脚版权说明, name: legal, widget: string, hint: "年份会自动更新，这里只写品牌和商标声明" }
