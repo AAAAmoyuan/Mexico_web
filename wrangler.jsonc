@@ -3,6 +3,18 @@
   "name": "mexico-web",
   "main": "src/worker.js",
   "compatibility_date": "2025-10-01",
+
+  // GitHub OAuth App 的 Client ID 不是密码（它会明文出现在 GitHub 授权链接里），可以公开。
+  // 写在这里 = 每次部署都自动带上，不会被 wrangler 当成"配置里没有的变量"清掉。
+  "vars": {
+    "GITHUB_CLIENT_ID": "Ov23liqwCm3Qfwryj8Yt"
+  },
+
+  // 保留 Cloudflare 后台手动添加的其它变量（默认情况下 wrangler 配置文件是唯一真相源，
+  // 部署时会把后台加的变量删掉）。GITHUB_CLIENT_SECRET 用 Secret 类型存在后台，
+  // 部署不会动它，所以不写在这里。
+  "keep_vars": true,
+
   "assets": {
     "directory": ".",
     "binding": "ASSETS"

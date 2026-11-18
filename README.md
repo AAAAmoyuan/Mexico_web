@@ -105,7 +105,7 @@ Turn this product photo into a transparent-background product image: remove the 
 5. **改了样式/页面结构看不到变化？** CSS 和 JS 文件名不变，浏览器可能还留着旧文件；
    按 `Ctrl + Shift + R` 强制刷新一次。以后改样式时把 `index.html` 里 `style.css?v=2` 的
    `v=2` 改成 `v=3` 就能让所有访客立刻拿到新文件。
-6. **改坏了想退回？** 让我帮你看仓库的提交记录，可以回滚到任意一次保存之前。
+8. **改坏了想退回？** 让我帮你看仓库的提交记录，可以回滚到任意一次保存之前。
 
 ---
 
@@ -155,8 +155,10 @@ npx decap-server                    # 另开一个终端，后台免登录编辑
    - Homepage URL：`https://mexico-web.luyonghuang.workers.dev`
    - Authorization callback URL：`https://mexico-web.luyonghuang.workers.dev/api/callback`
 2. **Worker 变量**（Settings → Variables and Secrets）
-   - `GITHUB_CLIENT_ID`（Text）
-   - `GITHUB_CLIENT_SECRET`（**Secret**）
+   - `GITHUB_CLIENT_SECRET`（**Secret**）← 只有这一个需要手动加
+   - `GITHUB_CLIENT_ID` 写在 `wrangler.jsonc` 的 `vars` 里，每次部署自动带上
+     （它会在授权链接里明文出现，不算密码；而 wrangler 部署时会把后台手动加的
+     普通变量删掉，所以放在配置文件里才不会丢。`keep_vars: true` 是第二道保险）
 3. 换域名时：`admin/config.yml` 里 `base_url`、`site_url`、`display_url` 三处，加上 OAuth App 的
    callback 地址要一起改
 
