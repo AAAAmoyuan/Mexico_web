@@ -1,0 +1,176 @@
+# =============================================================================
+#  Decap CMS 配置 —— JUESHITUO 落地页
+#  改完这个文件后提交推送，Cloudflare Pages 会自动重新部署。
+# =============================================================================
+
+backend:
+  name: github
+  repo: AAAAmoyuan/Mexico_web # GitHub 仓库：账号/仓库名
+  branch: main
+
+  # ⚠️ 部署后必须改成你自己的站点地址（不要带结尾斜杠）
+  #    例如：https://mexico-web.pages.dev  或  https://你的域名.com
+  base_url: https://YOUR-SITE.pages.dev
+  auth_endpoint: /api/auth
+
+# 本地开发：在本地跑 `npx decap-server` 时可以免登录编辑（生产环境不受影响）
+local_backend: true
+
+# 后台界面的站点信息
+site_url: https://YOUR-SITE.pages.dev
+display_url: https://YOUR-SITE.pages.dev
+logo_url: https://YOUR-SITE.pages.dev/assets/img/product-cutout.webp
+
+# 界面语言：zh_Hans = 简体中文；想换成西语改成 es
+locale: zh_Hans
+
+# 上传的图片存放位置
+media_folder: "assets/img/uploads"
+public_folder: "/assets/img/uploads"
+
+# 每次保存自动生成的提交信息
+commit_messages:
+  create: "内容更新：新建 {{collection}} {{path}}"
+  update: "内容更新：修改 {{collection}} {{path}}"
+  delete: "内容更新：删除 {{collection}} {{path}}"
+
+collections:
+  - name: site
+    label: 网站内容
+    label_singular: 页面
+    description: 落地页的全部文字和图片
+    files:
+      - name: home
+        label: 首页文案
+        file: content/site.json
+        format: json
+        fields:
+          # ---------------- 品牌 ----------------
+          - label: 品牌
+            name: brand
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 品牌名, name: name, widget: string, hint: "顶栏和页脚显示的名字" }
+              - { label: 页脚标语, name: tagline, widget: string }
+
+          # ---------------- 购买链接 ----------------
+          - label: 购买链接
+            name: shop
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 商品链接, name: url, widget: string, hint: "所有「购买」按钮都会跳到这个地址" }
+              - { label: 按钮文字（顶栏）, name: cta_label_header, widget: string, hint: "右上角那个小按钮" }
+              - { label: 按钮文字（正文）, name: cta_label, widget: string, hint: "首屏和产品区的大按钮" }
+
+          # ---------------- SEO ----------------
+          - label: 搜索引擎信息
+            name: seo
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 网页标题, name: title, widget: string, hint: "浏览器标签页显示的文字" }
+              - { label: 网页描述, name: description, widget: text, hint: "搜索结果里显示的简介，建议 150 字以内" }
+              - { label: 分享标题, name: og_title, widget: string, hint: "发到 WhatsApp / Facebook 时显示的标题" }
+              - { label: 分享描述, name: og_description, widget: text }
+              - { label: 分享图片, name: og_image, widget: image, required: false }
+
+          # ---------------- 首屏轮播 ----------------
+          - label: 首屏轮播
+            name: hero
+            widget: object
+            collapsed: true
+            fields:
+              - label: 幻灯片
+                name: slides
+                widget: list
+                hint: "本模板固定 3 张，多出来的不会显示"
+                summary: "{{fields.kicker}} — {{fields.title}}"
+                fields:
+                  - { label: 小标题, name: kicker, widget: string }
+                  - { label: 大标题, name: title, widget: text, hint: "需要换行的地方按回车" }
+                  - { label: 副标题, name: sub, widget: string }
+                  - { label: 按钮文字, name: cta, widget: string }
+
+          # ---------------- 产品区 ----------------
+          - label: 产品区
+            name: product
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 小标题, name: kicker, widget: string }
+              - { label: 大标题, name: heading, widget: string }
+              - { label: 正文, name: lead, widget: text }
+              - { label: 卖点清单, name: checks, widget: text, hint: "一行一条，显示为打勾列表" }
+              - { label: 价格旁说明, name: price_note, widget: string, hint: "例如：Incluye 1 funda · Garantía 1 año" }
+              - { label: 产品图, name: image, widget: image }
+              - { label: 产品图说明（alt）, name: image_alt, widget: string, hint: "给搜索引擎和读屏软件看的一句话描述" }
+
+          # ---------------- 卖点区 ----------------
+          - label: 卖点区
+            name: features
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 小标题, name: kicker, widget: string }
+              - { label: 大标题, name: heading, widget: string }
+              - { label: 引言, name: quote, widget: text }
+              - { label: 引言署名, name: quote_by, widget: string }
+              - label: 卖点图
+                name: cards
+                widget: list
+                hint: "固定 5 张，多出来的不会显示"
+                summary: "{{fields.alt}}"
+                fields:
+                  - { label: 图片, name: image, widget: image }
+                  - { label: 图片说明（alt）, name: alt, widget: string }
+
+          # ---------------- MagSafe 区 ----------------
+          - label: MagSafe 区
+            name: magsafe
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 小标题, name: kicker, widget: string }
+              - { label: 大标题, name: heading, widget: string }
+              - { label: 正文, name: lead, widget: text }
+              - { label: 适用场景, name: pills, widget: text, hint: "一行一条，显示为小标签" }
+              - { label: 配图, name: image, widget: image }
+              - { label: 配图说明（alt）, name: image_alt, widget: string }
+
+          # ---------------- 兼容性区 ----------------
+          - label: 兼容性区
+            name: compatibility
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 小标题, name: kicker, widget: string }
+              - { label: 大标题, name: heading, widget: string }
+              - label: 说明卡片
+                name: cards
+                widget: list
+                hint: "固定 3 张，多出来的不会显示"
+                summary: "{{fields.title}}"
+                fields:
+                  - { label: 标题, name: title, widget: string }
+                  - { label: 说明, name: text, widget: text }
+
+          # ---------------- 品牌故事区 ----------------
+          - label: 品牌故事区
+            name: brand_story
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 小标题, name: kicker, widget: string }
+              - { label: 大标题, name: heading, widget: string }
+              - { label: 正文, name: text, widget: text }
+              - { label: 按钮文字, name: cta, widget: string }
+
+          # ---------------- 页脚 ----------------
+          - label: 页脚
+            name: footer
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 免责声明, name: disclaimer, widget: text }

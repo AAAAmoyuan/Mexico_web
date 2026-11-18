@@ -5,10 +5,16 @@
 ## 目录
 
 ```
-index.html              页面（全部文案在 HTML 里）
+index.html              页面结构（文案已改为可被后台覆盖，默认值仍写在这里）
+content/site.json       ★ 所有文案和图片 —— 后台改的就是这个文件
+admin/                  Decap CMS 后台（/admin/）
+admin/config.yml        后台表单定义（哪个字段对应哪段文字、中文标签）
+functions/api/          Cloudflare Pages Functions：GitHub OAuth 登录代理
 assets/css/style.css    样式
+assets/js/content.js    读取 content/site.json 并填充页面
 assets/js/main.js       轮播 / 顶栏 / 入场动画
 assets/img/             hero 背景、产品图、卖点图
+assets/img/uploads/     后台后台上传的新图片会进这里
 _headers                Cloudflare Pages 缓存与安全头
 robots.txt
 _tools/make-heroes.py   可选：重新生成 hero 背景图（需要 Pillow）
@@ -26,13 +32,75 @@ npx serve .
 
 打开 http://localhost:8080（不要直接双击 index.html，用 http 服务更接近线上）。
 
+后台在 http://localhost:8080/admin/ 。
+
+## 内容管理后台（Decap CMS）
+
+不懂代码的同事打开 `https://你的域名/admin/`，用 GitHub 账号登录，就能改文字和换图；
+保存后会自动提交到仓库，Cloudflare Pages 随后自动重新部署，几分钟后线上生效。
+
+![后台编辑界面](_preview/cms-admin.png)
+
+### 工作原理
+
+```
+/admin/ (Decap CMS)  --OAuth-->  /api/auth · /api/callback (Pages Functions)
+        |                                    |
+        |  读写 content/site.json            |  换取 GitHub token
+        v                                    v
+     GitHub 仓库  ---------------------->  GitHub OAuth App
+        |
+        |  push 触发构建
+        v
+   Cloudflare Pages  ->  线上页面（content.js 用 JSON 填充文案）
+```
+
+### 一次性配置（部署后做一次）
+
+1. **Cloudflare Pages 必须用 Git 集成部署**（连接 GitHub 仓库），
+   否则 Functions 不会生效、后台保存也不会自动发布。
+   - 构建命令留空（这是纯静态站），输出目录填 `/`
+2. **创建一个 GitHub OAuth App**：https://github.com/settings/applications/new
+   - Application name：`Mexico_web CMS`
+   - Homepage URL：你的站点地址
+   - Authorization callback URL：`https://你的域名/api/callback`
+   - 创建后记下 **Client ID**，再 Generate a new client secret 拿到 **Client Secret**
+3. **在 Cloudflare Pages 加环境变量**（Settings → Variables and Secrets）：
+   - `GITHUB_CLIENT_ID`（明文）
+   - `GITHUB_CLIENT_SECRET`（类型选 Secret）
+   - 加完重新部署一次
+4. **把 `admin/config.yml` 里的 `YOUR-SITE.pages.dev` 换成真实域名**
+   （`base_url`、`site_url`、`display_url`、`logo_url` 四处）
+5. **给编辑者开权限**：GitHub 仓库 → Settings → Collaborators → Add people
+   对方需要一个 GitHub 账号，并接受邀请。Decap 的 GitHub 后端是按仓库写权限控制访问的。
+
+### 编辑者怎么用
+
+1. 打开 `https://你的域名/admin/`，点「使用 GitHub 登录」授权
+2. 左侧「网站内容 → 首页文案」，右侧按分区修改文字
+3. 点右上角 **Publish** 保存，等 1-2 分钟线上生效
+
+### 本地调试后台
+
+```bash
+npx decap-server          # 终端 1：本地编辑代理（config.yml 里 local_backend: true）
+python -m http.server 8080 # 终端 2
+```
+
+打开 http://localhost:8080/admin/ 可直接编辑本地文件，不需要登录。
+
 ## 部署到 Cloudflare Pages
 
-只需要上传 **`index.html` + `assets/` + `_headers` + `robots.txt`**；`手机壳/`、`_tools/`、`_preview/` 不用上传。
+推荐用 **Git 集成**（连接 GitHub 仓库），这样后台保存后会自动重新部署。
+构建命令留空，输出目录填 `/`。
 
-1. Cloudflare 控制台 → Workers & Pages → Create → Pages → Upload assets
-2. 把上面这些文件/目录拖进去，或 `wrangler pages deploy . --project-name=xxx`
+> 如果只是拖拽上传（Upload assets），网站能正常显示，但 **`/admin/` 后台不可用**
+> ——拖拽部署不支持 Pages Functions，而且后台保存后线上也不会自动更新。
+
+1. Cloudflare 控制台 → Workers & Pages → Create → Pages → Connect to Git
+2. 选 `AAAAmoyuan/Mexico_web` 仓库，分支 `main`，构建命令留空，输出目录 `/`
 3. 默认地址 `xxx.pages.dev`，需要的话再绑自定义域名
+4. 按上面「内容管理后台」里的步骤配 OAuth 和环境变量
 
 ## 图片说明
 
@@ -41,17 +109,19 @@ npx serve .
 - `product-main`：原竖图，用于 MagSafe 区块
 - `feature-*.webp`：你提供的 5 张卖点信息图（西语）
 
-替换方法：保持同名覆盖即可，宽高比尽量一致（hero 16:9、mobile 4:5）。
+替换方法：后台可以直接换产品区和卖点区的图；hero 背景图因为同时有
+`webp` / `jpg` / `-mobile` 三套，目前需要替换文件（保持同名、宽高比一致：hero 16:9、mobile 4:5）。
 
 ## 需要你改的地方
 
-- **品牌名**：当前用 `JUESHITUO`（取自你给的商品描述），在 `index.html` 里搜索替换即可（顶栏、页脚、品牌段）
-- **购买链接**：所有 CTA 已统一指向你的 Mercado Libre 商品页：
-  `https://www.mercadolibre.com.mx/funda-para-iphone-18-pro-con-protector-de-camara-y-magsafe/up/MLMU5112836898`
+- **域名**：`admin/config.yml` 里的 `YOUR-SITE.pages.dev` 必须换成真实域名，否则后台登录会失败
+- **品牌名 / 购买链接 / 价格文案**：现在都可以在后台改，不用动代码
 - **价格**：页面暂未写价格，需要的话我可以加一行 `$XXX MXN` 或划线价
 
 ## 备注
 
 - 顶栏导航 / 轮播 / 懒加载 / 响应式均已实现；hero 支持自动轮播、箭头、圆点、手机滑动
 - 页面语言为西班牙语（`lang="es"`），卖点图自带西语文案，语言统一
+- 首屏轮播固定 3 张、卖点图固定 5 张、兼容性卡片固定 3 张，后台多加的条目不会显示
+- 后台改的文字靠 `assets/js/content.js` 覆盖到页面上；JS 加载失败时页面显示 `index.html` 里的默认文案，不会白屏
 - Apple / iPhone 为 Apple Inc. 商标，页脚已加免责声明

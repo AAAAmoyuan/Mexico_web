@@ -1,0 +1,112 @@
+{
+  "brand": {
+    "name": "JUESHITUO",
+    "tagline": "Fundas para móvil con protección real."
+  },
+  "shop": {
+    "url": "https://www.mercadolibre.com.mx/funda-para-iphone-18-pro-con-protector-de-camara-y-magsafe/up/MLMU5112836898",
+    "cta_label": "Comprar ahora",
+    "cta_label_header": "Comprar"
+  },
+  "seo": {
+    "title": "JUESHITUO · Funda para iPhone 18 Pro con MagSafe y protector de cámara",
+    "description": "Funda transparente para iPhone 18 Pro con protector de cámara, anillo MagSafe (imán N56) y protección 360° anticaídas 3M. Incluye 1 funda. Garantía de 1 año.",
+    "og_title": "JUESHITUO · Funda para iPhone 18 Pro con MagSafe",
+    "og_description": "Protección 360°, imán N56 MagSafe y cristal antiamarilleo. Diseño transparente para iPhone 18 Pro.",
+    "og_image": "/assets/img/hero-1.jpg"
+  },
+  "hero": {
+    "slides": [
+      {
+        "kicker": "Nueva colección",
+        "title": "Funda para\niPhone 18 Pro",
+        "sub": "Protector de cámara · MagSafe · 3M anticaídas",
+        "cta": "Comprar ahora"
+      },
+      {
+        "kicker": "Protección 360°",
+        "title": "Protección\nintegral",
+        "sub": "3M anticaídas · Antiarañazos · Bordes reforzados",
+        "cta": "Comprar ahora"
+      },
+      {
+        "kicker": "MagSafe",
+        "title": "MagSafe\nsiempre listo",
+        "sub": "Imán N56 · Carga inalámbrica sin quitar la funda",
+        "cta": "Comprar ahora"
+      }
+    ]
+  },
+  "product": {
+    "kicker": "El producto",
+    "heading": "Diseño transparente, protección real",
+    "lead": "Esta versión cuenta con un diseño transparente, compatible con accesorios MagSafe, y ofrece protección para la cámara, la pantalla y las cuatro esquinas del iPhone 18 Pro.",
+    "checks": "Compatible con iPhone 18 Pro\nProtector de cámara y pantalla incluido en el diseño\nAnillo magnético MagSafe con imán N56\nResistencia a caídas desde 3M y a los arañazos",
+    "price_note": "Incluye 1 funda · Garantía 1 año",
+    "image": "/assets/img/product-cutout.webp",
+    "image_alt": "Funda JUESHITUO vino para iPhone 18 Pro, vista frontal y trasera"
+  },
+  "features": {
+    "kicker": "Por qué te va a gustar",
+    "heading": "Detalles que se sienten",
+    "quote": "“Más protegido sin perder la estética del iPhone.”",
+    "quote_by": "JUESHITUO",
+    "cards": [
+      {
+        "image": "/assets/img/feature-camera.webp",
+        "alt": "Control de cámara mejorado: respuesta táctil de alta precisión"
+      },
+      {
+        "image": "/assets/img/feature-magsafe.webp",
+        "alt": "Imán N56 fuerte, estable y seguro para accesorios MagSafe"
+      },
+      {
+        "image": "/assets/img/feature-drop.webp",
+        "alt": "Protección contra caídas de 3M con esquinas reforzadas"
+      },
+      {
+        "image": "/assets/img/feature-buttons.webp",
+        "alt": "Botones metálicos con malla antipolvo y precisión de clic"
+      },
+      {
+        "image": "/assets/img/feature-clarity.webp",
+        "alt": "Panel de cristal de alta transparencia con tratamiento antiamarilleo"
+      }
+    ]
+  },
+  "magsafe": {
+    "kicker": "MagSafe",
+    "heading": "Carga sin quitar la funda",
+    "lead": "El aro magnético permite usar cargadores inalámbricos, soportes de automóvil, carteras, bancos de energía y otros accesorios compatibles con MagSafe. No necesitas quitar la funda para cargar tu iPhone de forma inalámbrica.",
+    "pills": "Cargadores inalámbricos\nSoportes de coche\nCarteras MagSafe\nBancos de energía",
+    "image": "/assets/img/product-main.webp",
+    "image_alt": "Parte trasera transparente de la funda con anillo MagSafe"
+  },
+  "compatibility": {
+    "kicker": "Compatibilidad",
+    "heading": "Antes de comprar",
+    "cards": [
+      {
+        "title": "Modelo",
+        "text": "Compatible con iPhone 18 Pro. Selecciona correctamente el modelo de tu iPhone en la variante del producto para evitar errores de compatibilidad."
+      },
+      {
+        "title": "Qué incluye",
+        "text": "Recibes: 1 funda de celular magnética compatible para iPhone 18 Pro."
+      },
+      {
+        "title": "Garantía",
+        "text": "Garantía del vendedor: 1 año."
+      }
+    ]
+  },
+  "brand_story": {
+    "kicker": "Sobre la marca",
+    "heading": "JUESHITUO",
+    "text": "JUESHITUO sus fundas para móviles se venden bien en Estados Unidos, Europa, Japón, Corea del Sur y otros países y regiones. Desde su fundación, la marca se ha dedicado a ofrecer productos de alta calidad y un servicio excelente, y es muy apreciada por numerosos usuarios en el mercado.",
+    "cta": "Comprar en Mercado Libre"
+  },
+  "footer": {
+    "disclaimer": "Apple e iPhone son marcas registradas de Apple Inc. Este producto no está afiliado a Apple."
+  }
+}
