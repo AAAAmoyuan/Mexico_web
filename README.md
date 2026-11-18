@@ -1,6 +1,7 @@
 # Cloudflare 静态站 — JUESHITUO 手机壳落地页
 
-单页静态站（纯 HTML/CSS/JS，无构建步骤），可直接上传 Cloudflare Pages。
+单页静态站（纯 HTML/CSS/JS，无构建步骤），部署在 Cloudflare Workers 静态资源上，
+并带一个 Decap CMS 后台供不懂代码的同事维护文案。
 
 ## 目录
 
@@ -9,13 +10,15 @@ index.html              页面结构（文案已改为可被后台覆盖，默�
 content/site.json       ★ 所有文案和图片 —— 后台改的就是这个文件
 admin/                  Decap CMS 后台（/admin/）
 admin/config.yml        后台表单定义（哪个字段对应哪段文字、中文标签）
-functions/api/          Cloudflare Pages Functions：GitHub OAuth 登录代理
+src/worker.js           Cloudflare Worker：静态资源 + GitHub OAuth 登录代理
+wrangler.jsonc          Worker 部署配置（name / main / assets）
+.assetsignore           不随站点上传的仓库文件
 assets/css/style.css    样式
 assets/js/content.js    读取 content/site.json 并填充页面
 assets/js/main.js       轮播 / 顶栏 / 入场动画
 assets/img/             hero 背景、产品图、卖点图
 assets/img/uploads/     后台后台上传的新图片会进这里
-_headers                Cloudflare Pages 缓存与安全头
+_headers                缓存与安全头（Workers 静态资源同样支持）
 robots.txt
 _tools/make-heroes.py   可选：重新生成 hero 背景图（需要 Pillow）
 _preview/               本地预览截图（上传时可删）
@@ -37,40 +40,39 @@ npx serve .
 ## 内容管理后台（Decap CMS）
 
 不懂代码的同事打开 `https://你的域名/admin/`，用 GitHub 账号登录，就能改文字和换图；
-保存后会自动提交到仓库，Cloudflare Pages 随后自动重新部署，几分钟后线上生效。
+保存后会自动提交到仓库，Cloudflare Workers 随后自动重新部署，一两分钟后线上生效。
 
 ![后台编辑界面](_preview/cms-admin.png)
 
 ### 工作原理
 
 ```
-/admin/ (Decap CMS)  --OAuth-->  /api/auth · /api/callback (Pages Functions)
+/admin/ (Decap CMS)  --OAuth-->  /api/auth · /api/callback (src/worker.js)
         |                                    |
         |  读写 content/site.json            |  换取 GitHub token
         v                                    v
      GitHub 仓库  ---------------------->  GitHub OAuth App
         |
-        |  push 触发构建
+        |  push 触发 Workers Builds
         v
-   Cloudflare Pages  ->  线上页面（content.js 用 JSON 填充文案）
+   Cloudflare Worker  ->  线上页面（content.js 用 JSON 填充文案）
 ```
 
 ### 一次性配置（部署后做一次）
 
-1. **Cloudflare Pages 必须用 Git 集成部署**（连接 GitHub 仓库），
-   否则 Functions 不会生效、后台保存也不会自动发布。
-   - 构建命令留空（这是纯静态站），输出目录填 `/`
+1. **Worker 必须连上 GitHub 仓库（Workers Builds）**，否则后台保存后线上不会自动更新。
+   - Worker → Settings → Build → Connect，部署命令填 `npx wrangler deploy`，构建命令留空
 2. **创建一个 GitHub OAuth App**：https://github.com/settings/applications/new
    - Application name：`Mexico_web CMS`
    - Homepage URL：你的站点地址
    - Authorization callback URL：`https://你的域名/api/callback`
    - 创建后记下 **Client ID**，再 Generate a new client secret 拿到 **Client Secret**
-3. **在 Cloudflare Pages 加环境变量**（Settings → Variables and Secrets）：
+3. **在 Worker 里加环境变量**（Settings → Variables and Secrets）：
    - `GITHUB_CLIENT_ID`（明文）
    - `GITHUB_CLIENT_SECRET`（类型选 Secret）
    - 加完重新部署一次
-4. **把 `admin/config.yml` 里的 `YOUR-SITE.pages.dev` 换成真实域名**
-   （`base_url`、`site_url`、`display_url`、`logo_url` 四处）
+4. **换自定义域名时**，同步改 `admin/config.yml` 里 `base_url` / `site_url` /
+   `display_url` / `logo_url` 四处，以及 OAuth App 的 callback 地址
 5. **给编辑者开权限**：GitHub 仓库 → Settings → Collaborators → Add people
    对方需要一个 GitHub 账号，并接受邀请。Decap 的 GitHub 后端是按仓库写权限控制访问的。
 
@@ -89,18 +91,29 @@ python -m http.server 8080 # 终端 2
 
 打开 http://localhost:8080/admin/ 可直接编辑本地文件，不需要登录。
 
-## 部署到 Cloudflare Pages
+## 部署到 Cloudflare Workers
 
-推荐用 **Git 集成**（连接 GitHub 仓库），这样后台保存后会自动重新部署。
-构建命令留空，输出目录填 `/`。
+线上地址：https://mexico-web.luyonghuang.workers.dev
 
-> 如果只是拖拽上传（Upload assets），网站能正常显示，但 **`/admin/` 后台不可用**
-> ——拖拽部署不支持 Pages Functions，而且后台保存后线上也不会自动更新。
+站点是「Worker + 静态资源」：`wrangler.jsonc` 里的 `main` 是 `src/worker.js`
+（负责 `/api/*` 登录代理），`assets.directory` 是仓库根目录（其余文件原样提供）。
 
-1. Cloudflare 控制台 → Workers & Pages → Create → Pages → Connect to Git
-2. 选 `AAAAmoyuan/Mexico_web` 仓库，分支 `main`，构建命令留空，输出目录 `/`
-3. 默认地址 `xxx.pages.dev`，需要的话再绑自定义域名
-4. 按上面「内容管理后台」里的步骤配 OAuth 和环境变量
+**后台要能更新线上，必须走 Git 部署**，否则 CMS 提交了但网站不会重新发布：
+
+1. Cloudflare 控制台 → Workers & Pages → 点 `mexico-web` → Settings → Build
+2. Connect 到 `AAAAmoyuan/Mexico_web`，分支 `main`
+3. 构建命令留空，部署命令填 `npx wrangler deploy`
+4. 保存后点一次 Deploy，之后每次 `git push`（包括后台保存产生的提交）都会自动发布
+
+也可以在本机手动发布：
+
+```bash
+npx wrangler login     # 浏览器授权一次
+npx wrangler deploy
+```
+
+> 直接拖拽上传（Upload assets）会让 `/api/auth` 变成 404 —— 那是只有静态文件、
+> 没有 Worker 脚本的部署方式，后台登录不了。
 
 ## 图片说明
 
@@ -114,7 +127,8 @@ python -m http.server 8080 # 终端 2
 
 ## 需要你改的地方
 
-- **域名**：`admin/config.yml` 里的 `YOUR-SITE.pages.dev` 必须换成真实域名，否则后台登录会失败
+- **域名**：目前写死 `https://mexico-web.luyonghuang.workers.dev`，换域名时 `admin/config.yml` 四处
+  加 OAuth App 的 callback 地址要一起改
 - **品牌名 / 购买链接 / 价格文案**：现在都可以在后台改，不用动代码
 - **价格**：页面暂未写价格，需要的话我可以加一行 `$XXX MXN` 或划线价
 

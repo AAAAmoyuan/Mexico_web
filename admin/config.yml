@@ -8,18 +8,17 @@ backend:
   repo: AAAAmoyuan/Mexico_web # GitHub 仓库：账号/仓库名
   branch: main
 
-  # ⚠️ 部署后必须改成你自己的站点地址（不要带结尾斜杠）
-  #    例如：https://mexico-web.pages.dev  或  https://你的域名.com
-  base_url: https://YOUR-SITE.pages.dev
+  # 站点地址（不要带结尾斜杠）。换自定义域名时这四处一起改。
+  base_url: https://mexico-web.luyonghuang.workers.dev
   auth_endpoint: /api/auth
 
 # 本地开发：在本地跑 `npx decap-server` 时可以免登录编辑（生产环境不受影响）
 local_backend: true
 
 # 后台界面的站点信息
-site_url: https://YOUR-SITE.pages.dev
-display_url: https://YOUR-SITE.pages.dev
-logo_url: https://YOUR-SITE.pages.dev/assets/img/product-cutout.webp
+site_url: https://mexico-web.luyonghuang.workers.dev
+display_url: https://mexico-web.luyonghuang.workers.dev
+logo_url: https://mexico-web.luyonghuang.workers.dev/assets/img/product-cutout.webp
 
 # 界面语言：zh_Hans = 简体中文；想换成西语改成 es
 locale: zh_Hans
