@@ -171,6 +171,23 @@ export default {
         : handleCallback(request, url, env);
     }
 
+    /*
+     * Decap 的 config.yml 需要绝对地址，但站点可能同时挂在 workers.dev、
+     * 自定义域名、预览域名上。这里把文件里的 __ORIGIN__ 换成当前访问的域名，
+     * 换域名就不用再改配置文件了。
+     */
+    if (url.pathname === "/admin/config.yml") {
+      const res = await env.ASSETS.fetch(request);
+      if (!res.ok) return res;
+      const text = await res.text();
+      return new Response(text.split("__ORIGIN__").join(url.origin), {
+        headers: {
+          "Content-Type": "text/yaml; charset=utf-8",
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
     return env.ASSETS.fetch(request);
   },
 };

@@ -8,15 +8,16 @@ backend:
   repo: AAAAmoyuan/Mexico_web # GitHub 仓库：账号/仓库名
   branch: main
 
-  # 站点地址（不要带结尾斜杠）。换自定义域名时这四处一起改。
-  base_url: https://mexico-web.luyonghuang.workers.dev
+  # __ORIGIN__ 会被 src/worker.js 换成当前访问的域名（workers.dev / 自定义域名都行），
+  # 所以换域名不用改这里。直接改文件里的 __ORIGIN__ 是没用的。
+  base_url: __ORIGIN__
   auth_endpoint: /api/auth
 
 # 本地开发：跑 `npx decap-server` 时可以免登录编辑（线上不受影响）
 local_backend: true
 
-site_url: https://mexico-web.luyonghuang.workers.dev
-display_url: https://mexico-web.luyonghuang.workers.dev
+site_url: __ORIGIN__
+display_url: __ORIGIN__
 logo_url: /assets/img/case-product.png
 
 # 界面语言：zh_Hans = 简体中文；想换成西语改成 es

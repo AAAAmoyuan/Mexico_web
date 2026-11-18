@@ -17,6 +17,9 @@
 
   "assets": {
     "directory": ".",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    // /admin/config.yml 必须交给 Worker 处理（要替换里面的 __ORIGIN__），
+    // 否则静态资源会直接命中文件、绕过 Worker。
+    "run_worker_first": ["/admin/config.yml"]
   }
 }

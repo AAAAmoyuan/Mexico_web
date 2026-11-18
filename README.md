@@ -159,8 +159,20 @@ npx decap-server                    # 另开一个终端，后台免登录编辑
    - `GITHUB_CLIENT_ID` 写在 `wrangler.jsonc` 的 `vars` 里，每次部署自动带上
      （它会在授权链接里明文出现，不算密码；而 wrangler 部署时会把后台手动加的
      普通变量删掉，所以放在配置文件里才不会丢。`keep_vars: true` 是第二道保险）
-3. 换域名时：`admin/config.yml` 里 `base_url`、`site_url`、`display_url` 三处，加上 OAuth App 的
-   callback 地址要一起改
+3. 换域名时：**`admin/config.yml` 不用改**（里面写的是 `__ORIGIN__`，由 `src/worker.js`
+   按当前访问的域名替换）。只需要回 GitHub OAuth App 加一条 Redirect URI：
+   `https://新域名/api/callback`
+
+### 绑定自定义域名（可选）
+
+1. 把域名作为 zone 加到 Cloudflare（输入**根域名**，如 `f-lexin.com`）
+2. 核对扫描出来的 DNS 记录：**MX 必须保留**（企业邮），指向服务器的 A 记录建议设成「仅 DNS」（灰云）
+3. 去域名注册商把 NS 改成 Cloudflare 给的两条，等生效
+4. Workers & Pages → `mexico-web` → 设置 → 域和路由 → 添加 → **自定义域** → 填域名
+5. 回 GitHub OAuth App 加 Redirect URI：`https://新域名/api/callback`
+6. 重新部署一次（不用改任何文件）
+
+站点同时挂在 workers.dev 和自定义域名上都能用，后台登录会自动跟着当前域名走。
 
 ### 缓存策略
 
