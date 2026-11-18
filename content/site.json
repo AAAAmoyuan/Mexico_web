@@ -1,6 +1,6 @@
 {
   "brand": {
-    "name": "Robin"
+    "name": "陆永煌"
   },
   "nav": {
     "cta": "Learn More"
@@ -33,7 +33,6 @@
     "image_alt": "Protector de pantalla Robin de cristal templado"
   },
   "contact": {
-    "chat_title": "Robin Support",
     "bubbles": [
       {
         "from": "them",
@@ -48,13 +47,14 @@
         "text": "Llámanos o escanea el código QR: te atendemos al momento."
       }
     ],
-    "cta": "Call Now",
-    "phone": "+52 55 4855 5196",
-    "qr_title": "Escanea el código",
-    "qr_image": "/assets/img/contact-qr.png",
     "qr_alt": "Código QR de contacto de Robin",
-    "website": "www.f-lexin.com",
+    "phone": "+52 55 4855 5196",
     "hours": "Atención de lunes a viernes · 9:00–18:00",
-    "legal": "Robin · Apple e iPhone son marcas registradas de Apple Inc."
+    "cta": "Call Now",
+    "chat_title": "Robin Support",
+    "legal": "Robin · Apple e iPhone son marcas registradas de Apple Inc.",
+    "qr_title": "Escanea el código",
+    "website": "www.f-lexin.com",
+    "qr_image": "/assets/img/contact-qr.png"
   }
 }
