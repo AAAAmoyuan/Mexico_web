@@ -112,6 +112,8 @@ Turn this product photo into a transparent-background product image: remove the 
 
 ## 六、给技术同学
 
+> 需要改代码的协作成员，先看 [PUSH-GUIDE.md](PUSH-GUIDE.md)（推送规范、冲突处理、禁止事项）。
+
 ### 结构
 
 ```
