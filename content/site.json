@@ -2,9 +2,6 @@
   "brand": {
     "name": "YB"
   },
-  "nav": {
-    "cta": " "
-  },
   "seo": {
     "title": "Robin · Funda para iPhone 18 Pro y protector de pantalla",
     "description": "Robin: funda transparente para iPhone 18 Pro con MagSafe y protector de cámara, y protector de pantalla de cristal templado. Escríbenos por WhatsApp.",
@@ -33,28 +30,14 @@
     "image_alt": "Protector de pantalla Robin de cristal templado"
   },
   "contact": {
-    "bubbles": [
-      {
-        "from": "them",
-        "text": "¡Hola! ¿En qué podemos ayudarte?"
-      },
-      {
-        "from": "me",
-        "text": "Busco una funda y un protector para mi iPhone 18 Pro."
-      },
-      {
-        "from": "them",
-        "text": "Llámanos o escanea el código QR: te atendemos al momento."
-      }
-    ],
-    "qr_alt": "Código QR de contacto de Robin",
+    "kicker": "Contacto",
     "phone": "+52 55 4855 5196",
-    "hours": "Atención de lunes a viernes · 9:00–18:00",
+    "hours": "Atención de lunes a viernes\n9:00 – 18:00",
     "cta": "Call Now",
-    "chat_title": "Robin Support",
-    "legal": "Robin · Apple e iPhone son marcas registradas de Apple Inc.",
     "qr_title": "Escanea el código",
+    "qr_image": "/assets/img/contact-qr.png",
+    "qr_alt": "Código QR de contacto de Robin",
     "website": " ",
-    "qr_image": "/assets/img/contact-qr.png"
+    "legal": "Robin · Apple e iPhone son marcas registradas de Apple Inc."
   }
 }

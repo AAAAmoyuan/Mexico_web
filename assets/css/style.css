@@ -291,65 +291,20 @@ ul {
 /* ---------------- module 3 ---------------- */
 .contact-grid {
   display: grid;
-  grid-template-columns: 1.08fr 0.92fr;
-  gap: clamp(24px, 4vw, 56px);
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: clamp(24px, 4vw, 64px);
   align-items: center;
-}
-.chat-card,
-.qr-card {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  padding: clamp(22px, 2.6vw, 34px);
-  box-shadow: 0 26px 60px -34px rgba(0, 0, 0, 0.22);
-}
-.chat-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #3a3a3a;
-}
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
-}
-.bubbles {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-.bubble {
-  max-width: 90%;
-  padding: 12px 18px;
-  border-radius: 18px;
-  font-size: 15px;
-  line-height: 1.45;
-}
-.bubble.them {
-  justify-self: start;
-  background: #f2efec;
-  color: #2b2b2b;
-  border-bottom-left-radius: 6px;
-}
-.bubble.me {
-  justify-self: end;
-  background: var(--accent);
-  color: #fff;
-  border-bottom-right-radius: 6px;
 }
 .qr-card {
   display: grid;
   justify-items: center;
-  gap: 14px;
+  gap: 16px;
   text-align: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: clamp(24px, 3vw, 40px);
+  box-shadow: 0 26px 60px -34px rgba(0, 0, 0, 0.22);
 }
 .qr-title {
   font-size: 13px;
@@ -359,7 +314,7 @@ ul {
   color: #3a3a3a;
 }
 .qr-card img {
-  width: min(250px, 60%);
+  width: min(260px, 70%);
   aspect-ratio: 1;
   object-fit: contain;
   border-radius: 12px;
@@ -367,13 +322,41 @@ ul {
 .qr-sub {
   font-size: 13px;
   color: var(--soft);
+  letter-spacing: 0.02em;
 }
-.qr-meta {
+
+.contact-info {
+  --phone-size: clamp(30px, 3.3vw, 50px);
   display: grid;
-  gap: 4px;
-  font-size: 13px;
-  color: var(--soft);
+  justify-items: start;
+  gap: 14px;
 }
+.contact-info .kicker {
+  margin-bottom: 0;
+}
+.phone {
+  display: inline-block;
+  font-size: var(--phone-size);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  padding-bottom: 4px;
+  border-bottom: 3px solid var(--accent);
+  transition: color 0.25s;
+}
+.phone:hover {
+  color: var(--accent);
+}
+.hours {
+  font-size: calc(var(--phone-size) * 0.5);
+  line-height: 1.45;
+  color: var(--muted);
+}
+.contact-info .btn {
+  margin-top: 6px;
+}
+
 .legal {
   position: absolute;
   left: 0;
@@ -440,44 +423,21 @@ ul {
   }
   .contact-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 20px;
   }
-  .chat-card,
   .qr-card {
-    padding: 18px;
+    gap: 12px;
+    padding: 20px;
     border-radius: 20px;
   }
-  .chat-head {
-    margin-bottom: 12px;
-  }
-  .bubbles {
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .bubble {
-    font-size: 13.5px;
-    padding: 10px 14px;
-  }
-  .qr-card {
-    grid-template-columns: 128px 1fr;
-    justify-items: start;
-    text-align: left;
-    column-gap: 16px;
-    row-gap: 6px;
-    align-items: center;
-  }
   .qr-card img {
-    width: 128px;
-    grid-row: 1 / span 2;
+    width: 156px;
   }
-  .qr-title {
-    grid-column: 2;
-  }
-  .qr-meta {
-    grid-column: 2;
-  }
-  .qr-meta p {
-    font-size: 12px;
+  .contact-info {
+    --phone-size: clamp(26px, 7vw, 34px);
+    justify-items: center;
+    text-align: center;
+    gap: 12px;
   }
   .legal {
     font-size: 10.5px;
@@ -495,10 +455,6 @@ ul {
   .btn {
     padding: 12px 26px;
     font-size: 12px;
-  }
-  .btn-ghost {
-    padding: 9px 18px;
-    font-size: 11px;
   }
 }
 
@@ -526,8 +482,7 @@ ul {
     transform: none;
     transition: none;
   }
-  .scroll-hint span,
-  .live-dot {
+  .scroll-hint span {
     animation: none;
   }
 }

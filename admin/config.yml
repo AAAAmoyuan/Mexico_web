@@ -51,13 +51,6 @@ collections:
             fields:
               - { label: 品牌名, name: name, widget: string, hint: "顶栏左上角显示的名字" }
 
-          - label: 顶栏按钮
-            name: nav
-            widget: object
-            collapsed: true
-            fields:
-              - { label: 按钮文字, name: cta, widget: string, hint: "默认 Learn More，点击跳到第 3 屏" }
-
           # ---------------- SEO ----------------
           - label: 搜索引擎信息
             name: seo
@@ -106,25 +99,12 @@ collections:
             widget: object
             collapsed: true
             fields:
-              - { label: 聊天窗口标题, name: chat_title, widget: string, hint: "默认 Robin Support" }
-              - label: 聊天气泡
-                name: bubbles
-                widget: list
-                label_singular: 一条消息
-                summary: "{{fields.text}}"
-                fields:
-                  - label: 谁说的
-                    name: from
-                    widget: select
-                    options:
-                      - { label: 对方（左侧白气泡）, value: them }
-                      - { label: 我（右侧橙气泡）, value: me }
-                  - { label: 内容, name: text, widget: string }
-              - { label: 打电话按钮文字, name: cta, widget: string, hint: "默认 Call Now" }
+              - { label: 小标题, name: kicker, widget: string, hint: "默认 Contacto" }
               - { label: 电话号码, name: phone, widget: string, hint: "改成 +52 55 1234 5678 这种格式，拨号链接会自动生成" }
+              - { label: 服务时间, name: hours, widget: text, hint: "需要换行的地方按回车" }
+              - { label: 打电话按钮文字, name: cta, widget: string, hint: "默认 Call Now" }
               - { label: 二维码标题, name: qr_title, widget: string }
               - { label: 二维码图片, name: qr_image, widget: image, hint: "600×600 PNG，黑白、四周留白" }
               - { label: 二维码说明（alt）, name: qr_alt, widget: string }
-              - { label: 网址, name: website, widget: string }
-              - { label: 服务时间, name: hours, widget: string }
+              - { label: 二维码下方文字, name: website, widget: string, hint: "留空则不显示" }
               - { label: 页脚版权说明, name: legal, widget: string, hint: "年份会自动更新，这里只写品牌和商标声明" }
