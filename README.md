@@ -119,7 +119,7 @@ index.html              三屏结构（文案默认值写在这里，后台改�
 content/site.json       ★ 后台编辑的数据源
 admin/                  Decap CMS 后台（/admin/）
 admin/config.yml        后台表单定义（中文字段、提示、上传目录）
-src/worker.js           Worker：/api/auth、/api/callback 登录代理，其余交给静态资源
+src/worker.js           Worker：登录代理 + 配置域名替换 + 首页 SEO 标签注入
 wrangler.jsonc          Worker 部署配置（main + assets）
 assets/js/content.js    读 content/site.json 并填充页面（JS 失败时用 HTML 里的默认文案）
 assets/js/main.js       顶栏状态、滚动平滑、入场动画、年份
@@ -175,6 +175,22 @@ npx decap-server                    # 另开一个终端，后台免登录编辑
 6. 重新部署一次（不用改任何文件）
 
 站点同时挂在 workers.dev 和自定义域名上都能用，后台登录会自动跟着当前域名走。
+
+### 首页 SEO / 分享标签
+
+页面正文是 ssets/js/content.js 在浏览器里填的，但 **WhatsApp、Facebook、微信的爬虫不执行 JS**，
+只能读原始 HTML。所以 Worker 在返回 / 时会把 content/site.json 里的
+seo.title / description / og_title / og_description / og_image 直接写进 HTML，
+并补上 og:url 和 canonical（分享图必须是绝对地址才有效）。
+
+改了这三项之后：
+
+- 网页标题、搜索描述：刷新页面就生效
+- **分享卡片**：WhatsApp / Facebook 自己有缓存，可能几天不变；
+  想立刻看到效果，用 [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) 输入网址点「再次抓取」
+
+wrangler.jsonc 里的 ssets.run_worker_first 列出了必须先过 Worker 的路径
+（/、/index.html、/admin/config.yml），改路由时注意同步。
 
 ### 缓存策略
 

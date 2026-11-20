@@ -18,8 +18,9 @@
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
-    // /admin/config.yml 必须交给 Worker 处理（要替换里面的 __ORIGIN__），
-    // 否则静态资源会直接命中文件、绕过 Worker。
-    "run_worker_first": ["/admin/config.yml"]
+    // 这些路径必须先经过 Worker 处理，否则静态资源会直接命中文件、绕过 Worker：
+    //   /admin/config.yml  —— 要替换 __ORIGIN__
+    //   / 和 /index.html   —— 要在服务端写入 SEO / 分享标签
+    "run_worker_first": ["/admin/config.yml", "/", "/index.html"]
   }
 }

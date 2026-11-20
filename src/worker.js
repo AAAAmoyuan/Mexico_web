@@ -1,5 +1,5 @@
 /**
- * Cloudflare Worker —— JUESHITUO 落地页 + Decap CMS 的 GitHub OAuth 代理
+ * Cloudflare Worker —— Robin 落地页 + Decap CMS 的 GitHub OAuth 代理
  *
  * 为什么需要这个文件：站点部署在 Workers（静态资源），而 Pages Functions
  * 只在 Cloudflare Pages 上运行，Workers 里不会执行。所以把登录代理写成
@@ -8,6 +8,8 @@
  * 路由：
  *   /api/auth      跳转 GitHub 授权页（Decap 点「使用 GitHub 登录」时打开）
  *   /api/callback  GitHub 回跳，换 access_token 后交还给 /admin/
+ *   /admin/config.yml  Decap 配置，把 __ORIGIN__ 换成当前域名
+ *   /、/index.html    把后台填的 SEO/分享信息直接写进 HTML（爬虫不跑 JS）
  *   其它路径        交给静态资源（env.ASSETS）
  *
  * 需要在 Cloudflare 里配置两个变量：
@@ -158,6 +160,55 @@ async function handleCallback(request, url, env) {
   );
 }
 
+/**
+ * 把 content/site.json 里的 SEO / 分享信息直接写进首页 HTML。
+ *
+ * 为什么要服务端写：页面上其它文案是 assets/js/content.js 在浏览器里套上去的，
+ * 但 WhatsApp、Facebook、微信的爬虫不执行 JS，只能读原始 HTML。所以这几个标签
+ * 必须在服务端就已经是对的值，后台改了才会反映到分享卡片上。
+ */
+function applySeo(html, seo, origin) {
+  if (!seo || typeof seo !== "object") return html;
+
+  const absolute = (value) => {
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    return origin + (value.startsWith("/") ? value : "/" + value);
+  };
+
+  const setMeta = (source, pattern, attr, value) => {
+    if (!value) return source;
+    return source.replace(pattern, (match) => {
+      // 换掉 content="..." 那一段，保留标签的其它属性
+      const replaced = match.replace(/\bcontent="[^"]*"/i, `content="${escapeHtml(value)}"`);
+      return replaced;
+    });
+  };
+
+  let out = html;
+
+  if (seo.title) {
+    out = out.replace(/<title\b[^>]*>[\s\S]*?<\/title>/i, (match) =>
+      match.replace(/>[\s\S]*</, `>${escapeHtml(seo.title)}<`)
+    );
+  }
+
+  out = setMeta(out, /<meta\s+name="description"[^>]*>/i, "content", seo.description);
+  out = setMeta(out, /<meta\s+property="og:title"[^>]*>/i, "content", seo.og_title || seo.title);
+  out = setMeta(out, /<meta\s+property="og:description"[^>]*>/i, "content", seo.og_description || seo.description);
+  out = setMeta(out, /<meta\s+property="og:image"[^>]*>/i, "content", absolute(seo.og_image));
+
+  // 补上 og:url 和 canonical（相对地址的分享图要用绝对 URL 才有效）
+  if (!/rel="canonical"/i.test(out)) {
+    out = out.replace(
+      /<\/head>/i,
+      `  <meta property="og:url" content="${escapeHtml(origin + "/")}" />\n    <link rel="canonical" href="${escapeHtml(origin + "/")}" />\n  </head>`
+    );
+  }
+
+  return out;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -186,6 +237,39 @@ export default {
           "Cache-Control": "no-store",
         },
       });
+    }
+
+    if (url.pathname === "/" || url.pathname === "/index.html") {
+      const res = await env.ASSETS.fetch(request);
+      if (!res.ok) return res;
+
+      try {
+        const [html, jsonRes] = await Promise.all([
+          res.text(),
+          env.ASSETS.fetch(new URL("/content/site.json", url.origin).toString()),
+        ]);
+
+        if (jsonRes.ok) {
+          const data = await jsonRes.json();
+          return new Response(applySeo(html, data.seo, url.origin), {
+            status: 200,
+            headers: {
+              "Content-Type": "text/html; charset=utf-8",
+              "Cache-Control": "public, max-age=0, must-revalidate",
+            },
+          });
+        }
+
+        return new Response(html, {
+          headers: {
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "public, max-age=0, must-revalidate",
+          },
+        });
+      } catch {
+        // 出任何问题就退回原始静态文件，页面照常显示
+        return res;
+      }
     }
 
     return env.ASSETS.fetch(request);
