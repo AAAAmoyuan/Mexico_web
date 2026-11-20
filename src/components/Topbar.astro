@@ -1,0 +1,14 @@
+---
+const { brand, jumpLabel } = Astro.props;
+---
+
+<header class="topbar" id="topbar">
+  <a class="brand" href="#screen-1" aria-label={`${brand.name} inicio`}>
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-name">{brand.name}</span>
+  </a>
+
+  {jumpLabel && (
+    <a class="btn-ghost" href="#contact" data-scroll>{jumpLabel}</a>
+  )}
+</header>

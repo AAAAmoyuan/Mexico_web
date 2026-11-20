@@ -17,3 +17,5 @@ __pycache__/
 # Wrangler 本地变量（含密钥，永远不要提交）
 .dev.vars
 .wrangler/
+dist/
+.astro/

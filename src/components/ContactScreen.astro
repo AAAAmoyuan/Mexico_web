@@ -1,0 +1,44 @@
+---
+// 最后一屏：固定为联系方式，数据来自 home.json 的 contact 对象
+const { data } = Astro.props;
+
+const hoursLines = String(data.hours ?? "").split("\n");
+const telHref = "tel:" + String(data.phone ?? "").replace(/[^0-9+]/g, "");
+const year = new Date().getFullYear();
+---
+
+<section class="screen screen-contact" id="contact" aria-label="Contacto">
+  <div class="wrap contact-grid">
+    <div class="qr-card" data-anim>
+      <p class="qr-title">{data.qrTitle}</p>
+      <img
+        src={data.qrImage}
+        alt={data.qrAlt ?? ""}
+        width="600"
+        height="600"
+        loading="lazy"
+        decoding="async"
+      />
+      <p class="qr-sub">{data.website}</p>
+    </div>
+
+    <div class="contact-info" data-anim>
+      <p class="kicker">{data.kicker}</p>
+
+      <a class="phone" href={telHref}>{data.phone}</a>
+
+      <p class="hours">
+        {hoursLines.map((line, i) => (
+          <Fragment>
+            {line}
+            {i < hoursLines.length - 1 && <br />}
+          </Fragment>
+        ))}
+      </p>
+
+      <a class="btn" href={telHref}>{data.cta}</a>
+    </div>
+  </div>
+
+  <p class="legal">© {year} {data.legal}</p>
+</section>

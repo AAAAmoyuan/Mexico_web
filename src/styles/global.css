@@ -145,8 +145,7 @@ ul {
   align-items: center;
   padding: 96px 0 52px;
 }
-.screen-case,
-.screen-film {
+.screen-product {
   background: var(--white);
 }
 .screen-contact {

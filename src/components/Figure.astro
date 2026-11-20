@@ -1,0 +1,18 @@
+---
+// 商品图槽位：结构完全沿用 0.2.1 的 .figure > .slot > img
+const { image, imageAlt, eager = false } = Astro.props;
+---
+
+<div class="figure" data-anim>
+  <div class="slot">
+    <img
+      src={image}
+      alt={imageAlt ?? ""}
+      width="1200"
+      height="1600"
+      fetchpriority={eager ? "high" : undefined}
+      loading={eager ? undefined : "lazy"}
+      decoding="async"
+    />
+  </div>
+</div>

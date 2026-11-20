@@ -1,0 +1,48 @@
+{
+  "brand": { "name": "YB" },
+
+  "nav": { "jumpLabel": "Contacto" },
+
+  "seo": {
+    "title": "Robin · Funda para iPhone 18 Pro y protector de pantalla",
+    "description": "Robin: funda transparente para iPhone 18 Pro con MagSafe y protector de cámara, y protector de pantalla de cristal templado. Escríbenos por WhatsApp.",
+    "ogImage": "/uploads/case-product.png"
+  },
+
+  "screens": [
+    {
+      "kicker": "Nueva colección",
+      "title": "Funda para\niPhone 18 Pro",
+      "subtitle": "Diseño transparente con anillo MagSafe, protector de cámara y resistencia a caídas de 3M.",
+      "bullets": "Anillo MagSafe con imán N56\nCristal antiamarilleo y botón de cámara preciso\nProtección 360° para cámara, pantalla y esquinas",
+      "cta": "Buy Now",
+      "link": "https://www.mercadolibre.com.mx/funda-para-iphone-18-pro-con-protector-de-camara-y-magsafe/up/MLMU5112836898",
+      "image": "/uploads/case-product.png",
+      "imageAlt": "Funda Robin color vino para iPhone 18 Pro con anillo MagSafe",
+      "layout": "imageRight"
+    },
+    {
+      "kicker": "Protección de pantalla",
+      "title": "Protector de\npantalla",
+      "subtitle": "Cristal templado de alta transparencia con dureza 9H y cobertura total. Se instala sin burbujas y mantiene el tacto original del iPhone.",
+      "bullets": "Dureza 9H antiarañazos\nTratamiento antihuellas y antiamarilleo\nBordes reforzados y ajuste sin burbujas",
+      "cta": "Buy Now",
+      "link": "https://www.mercadolibre.com.mx/funda-para-iphone-18-pro-con-protector-de-camara-y-magsafe/up/MLMU5112836898",
+      "image": "/uploads/film-product.png",
+      "imageAlt": "Protector de pantalla Robin de cristal templado",
+      "layout": "imageLeft"
+    }
+  ],
+
+  "contact": {
+    "kicker": "Contacto",
+    "phone": "+52 55 4855 5196",
+    "hours": "Atención de lunes a viernes\n9:00 – 18:00",
+    "cta": "Call Now",
+    "qrTitle": "Escanea el código",
+    "qrImage": "/uploads/contact-qr.png",
+    "qrAlt": "Código QR de contacto de Robin",
+    "website": " ",
+    "legal": "Robin · Apple e iPhone son marcas registradas de Apple Inc."
+  }
+}

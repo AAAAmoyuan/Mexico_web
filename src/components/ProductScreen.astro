@@ -1,0 +1,45 @@
+---
+import Figure from "./Figure.astro";
+
+// 一屏商品展示模块 —— 与 0.2.1 的第 1/2 屏结构完全一致
+const { screen, index, reverse = false } = Astro.props;
+
+const lines = String(screen.title ?? "").split("\n");
+const bullets = String(screen.bullets ?? "").split("\n").filter(Boolean);
+const eager = index === 0;
+---
+
+<section class="screen screen-product" id={`screen-${index + 1}`}>
+  <div class={`wrap grid${reverse ? " grid-reverse" : ""}`}>
+    {reverse && <Figure image={screen.image} imageAlt={screen.imageAlt} eager={eager} />}
+
+    <div class="copy" data-anim>
+      <p class="kicker">{screen.kicker}</p>
+
+      <h1>
+        {lines.map((line, i) => (
+          <Fragment>
+            {line}
+            {i < lines.length - 1 && <br />}
+          </Fragment>
+        ))}
+      </h1>
+
+      <p class="sub">{screen.subtitle}</p>
+
+      {bullets.length > 0 && (
+        <ul class="checks">
+          {bullets.map((item) => <li>{item}</li>)}
+        </ul>
+      )}
+
+      {screen.link && (
+        <a class="btn" href={screen.link} target="_blank" rel="noopener">{screen.cta}</a>
+      )}
+    </div>
+
+    {!reverse && <Figure image={screen.image} imageAlt={screen.imageAlt} eager={eager} />}
+  </div>
+
+  <div class="scroll-hint" aria-hidden="true"><span></span>Desliza</div>
+</section>
