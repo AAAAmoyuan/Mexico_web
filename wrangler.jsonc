@@ -16,11 +16,11 @@
   "keep_vars": true,
 
   "assets": {
-    "directory": ".",
+    // Astro 的构建产物
+    "directory": "./dist",
     "binding": "ASSETS",
-    // 这些路径必须先经过 Worker 处理，否则静态资源会直接命中文件、绕过 Worker：
-    //   /admin/config.yml  —— 要替换 __ORIGIN__
-    //   / 和 /index.html   —— 要在服务端写入 SEO / 分享标签
-    "run_worker_first": ["/admin/config.yml", "/", "/index.html"]
+    // 这个路径必须先经过 Worker 处理，否则静态资源会直接命中文件、绕过 Worker：
+    // /admin/config.yml 需要把 __ORIGIN__ 替换成当前访问的域名
+    "run_worker_first": ["/admin/config.yml"]
   }
 }

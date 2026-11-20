@@ -71,12 +71,11 @@ Turn this product photo into a transparent-background product image: remove the 
 
 | 后台分区 | 改的是 |
 |---|---|
-| 品牌 → 品牌名 | 左上角 `Robin` |
-| 顶栏按钮 | 右上角 `Learn More` |
-| 搜索引擎信息 | 浏览器标签页标题、搜索结果简介、分享到 WhatsApp/Facebook 的标题和图 |
-| 第 1 屏 · 手机壳 | 小标题、大标题、副标题、三条卖点、按钮文字、按钮链接、产品图 |
-| 第 2 屏 · 手机膜 | 同上 |
-| 第 3 屏 · 联系方式 | 小标题、电话号码、营业时间、打电话按钮、二维码标题/图片、二维码下方文字、页脚版权 |
+| 品牌 → 品牌名 | 左上角品牌名 |
+| 顶栏按钮 | 右上角的「直达尾页」按钮文字（留空则不显示） |
+| 搜索引擎信息 | 浏览器标签页标题、搜索结果简介、分享到 WhatsApp/Facebook 的图 |
+| **商品展示屏** | ★ 一屏商品。点「新增一屏」加，按住左侧手柄拖动排序，右侧 ✕ 删除 |
+| 联系方式（最后一屏） | 小标题、电话号码、营业时间、打电话按钮、二维码、页脚版权 |
 
 **填写小贴士**
 
@@ -85,7 +84,8 @@ Turn this product photo into a transparent-background product image: remove the 
 - **营业时间**想分两行就按回车
 - **二维码下方文字**留空就不显示
 - **电话号码**只填一次（例如 `+52 55 1234 5678`），「Call Now」按钮的拨号链接会自动跟着变
-- 页脚年份会自动更新，不用管
+- **图文左右**：每屏可以单独选「文左图右 / 图左文右 / 自动交替」
+- 页脚年份在构建时自动生成，不用管
 
 ---
 
@@ -103,9 +103,7 @@ Turn this product photo into a transparent-background product image: remove the 
 2. **点「使用 GitHub 登录」报错、或提示没权限？** 说明这个 GitHub 账号还没被加成仓库协作者，找管理员加。
 3. **图片上传后没显示？** 检查格式（PNG）、大小（1 MB 以内），然后 `Ctrl + F5`。
 4. **两个人一起改会打架吗？** 不会报错，但同一条内容以最后保存的为准；建议不同时改同一屏。
-5. **改了样式/页面结构看不到变化？** CSS 和 JS 文件名不变，浏览器可能还留着旧文件；
-   按 `Ctrl + Shift + R` 强制刷新一次。以后改样式时把 `index.html` 里 `style.css?v=2` 的
-   `v=2` 改成 `v=3` 就能让所有访客立刻拿到新文件。
+5. **加了/删了一屏，线上没变化？** 先看 Cloudflare 的构建有没有成功（失败时线上保持旧版）。
 8. **改坏了想退回？** 让我帮你看仓库的提交记录，可以回滚到任意一次保存之前。
 
 ---
@@ -117,29 +115,34 @@ Turn this product photo into a transparent-background product image: remove the 
 ### 结构
 
 ```
-index.html              三屏结构（文案默认值写在这里，后台改的内容会覆盖它）
-content/site.json       ★ 后台编辑的数据源
-admin/                  Decap CMS 后台（/admin/）
-admin/config.yml        后台表单定义（中文字段、提示、上传目录）
-src/worker.js           Worker：登录代理 + 配置域名替换 + 首页 SEO 标签注入
-wrangler.jsonc          Worker 部署配置（main + assets）
-assets/js/content.js    读 content/site.json 并填充页面（JS 失败时用 HTML 里的默认文案）
-assets/js/main.js       顶栏状态、滚动平滑、入场动画、年份
-assets/css/style.css    样式（三屏 100svh + scroll-snap）
-assets/img/             case-product.png / film-product.png / contact-qr.png
-assets/img/uploads/     后台后台上传的新图片
-_headers                缓存与安全头（Workers 静态资源同样支持）
-.assetsignore           不随站点上传的仓库文件
-_preview/               预览截图，不对外
-versions/               每一版设计包的存档（0.2 / 0.2.1），不对外，见 versions/README.md
+src/pages/index.astro      ★ 首页：screens.map() 决定渲染几屏
+src/components/            ProductScreen（一屏商品）/ ContactScreen（固定最后一屏）/ Topbar / Figure
+src/layouts/Base.astro     构建时写入 title / description / og / canonical
+src/content/home.json      ★ 后台编辑的唯一数据源
+src/styles/global.css      样式（一屏 100svh + scroll-snap）
+src/scripts/main.js        顶栏状态、平滑滚动（直达尾页）、入场动画
+src/worker.js              Worker：OAuth 代理 + config.yml 域名替换
+public/admin/              Decap CMS 后台（/admin/）
+public/uploads/            图片（后台新上传的也在这里）
+public/_headers            缓存与安全头
+public/robots.txt
+astro.config.mjs           Astro 配置（site 里是正式域名）
+wrangler.jsonc             Worker 部署配置（main + assets=dist）
+_preview/                  设计稿截图，不对外
+versions/                  每一版设计包的存档（0.2 / 0.2.1），不对外
+dist/                      构建产物，已 gitignore
 ```
 
-### 本地预览
+### 本地开发
 
 ```bash
-python -m http.server 8080          # 打开 http://localhost:8080
-npx decap-server                    # 另开一个终端，后台免登录编辑本地文件
+npm install          # 第一次
+npm run dev          # http://localhost:4321
+npm run build        # 生成 dist/
+npm run preview      # 预览构建产物
 ```
+
+想在本地用后台改内容：另开一个终端跑 `npx decap-server`，再访问 `/admin/` 即可免登录编辑本地文件。
 
 ### 部署
 
@@ -149,9 +152,17 @@ npx decap-server                    # 另开一个终端，后台免登录编辑
 后台保存 → 提交到 GitHub → Workers 自动重新部署，所以 **Worker 必须连上仓库**：
 
 1. Cloudflare 控制台 → Workers & Pages → `mexico-web` → Settings → Build → Connect
-2. 仓库 `AAAAmoyuan/Mexico_web`，分支 `main`，构建命令留空，**部署命令 `npx wrangler deploy`**
+2. 仓库 `AAAAmoyuan/Mexico_web`，分支 `main`
+3. **构建命令 `npm ci && npm run build`**（不要留空），**部署命令 `npx wrangler deploy`**
 
-也可以本机手动发布：`npx wrangler login` 然后 `npx wrangler deploy`。
+> Astro 是构建型项目，静态资源目录已改成 `./dist`。构建命令必须先生成 `dist/`，
+> 否则 `wrangler deploy` 找不到文件会失败（失败时 Cloudflare 保留上一版，站点不会挂）。
+
+也可以本机手动发布：
+
+```bash
+npm run build && npx wrangler deploy
+```
 
 ### 一次性配置（已做完就不用管）
 

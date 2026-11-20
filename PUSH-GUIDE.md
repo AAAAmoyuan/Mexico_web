@@ -182,9 +182,9 @@ git push -u origin redesign-xxx
 ## 8. 常见问题
 
 **Q：我推代码会不会把别人在后台改的内容冲掉？**
-不会。后台改的是 `content/site.json`，代码改动通常是 `index.html` / `assets/css/style.css`，一般是不同文件。真撞上同一个文件，按第 5 节解决。
+不会。后台改的是 `src/content/home.json`，代码改动通常是 `src/pages`、`src/components`、`src/styles`，一般是不同文件。真撞上同一个文件，按第 5 节解决。
 
-**Q：我直接改 `content/site.json` 可以吗？**
+**Q：我直接改 `src/content/home.json` 可以吗？**
 技术上可以，但**不建议**。后台有表单和校验；手改 JSON 多一个逗号就会导致整页文案不显示。要改内容就用后台。
 
 **Q：推送要输密码吗？**

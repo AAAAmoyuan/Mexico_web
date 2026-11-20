@@ -13,43 +13,69 @@ backend:
   base_url: __ORIGIN__
   auth_endpoint: /api/auth
 
+  # 提交信息模板：让 Git 记录里能看出「谁、改了哪个文件」
+  # 注意：这一项必须挂在 backend 下面，写在顶层不会生效
+  commit_messages:
+    create: "内容：{{author-name}} 新建 {{collection}} {{path}}"
+    update: "内容：{{author-name}} 修改 {{collection}} {{path}}"
+    delete: "内容：{{author-name}} 删除 {{collection}} {{path}}"
+    uploadMedia: "图片：{{author-name}} 上传 {{path}}"
+    deleteMedia: "图片：{{author-name}} 删除 {{path}}"
+
 # 本地开发：跑 `npx decap-server` 时可以免登录编辑（线上不受影响）
 local_backend: true
 
 site_url: __ORIGIN__
 display_url: __ORIGIN__
-logo_url: /assets/img/case-product.png
+logo_url: /uploads/case-product.png
 
 # 界面语言：zh_Hans = 简体中文；想换成西语改成 es
 locale: zh_Hans
 
-# 上传的新图片放这里，不会覆盖原有图片
-media_folder: "assets/img/uploads"
-public_folder: "/assets/img/uploads"
+# 上传的图片进 public/uploads，构建时会原样复制到 dist/uploads
+media_folder: "public/uploads"
+public_folder: "/uploads"
 
-commit_messages:
-  create: "内容更新：新建 {{collection}} {{path}}"
-  update: "内容更新：修改 {{collection}} {{path}}"
-  delete: "内容更新：删除 {{collection}} {{path}}"
+# 上传时在浏览器里自动转码压缩：运营直接传手机原图也不会拖慢页面
+media_processing:
+  enabled: true
+  format:
+    enabled: true
+    default: webp
+  quality: 82
+  strip_metadata: true
+  width: 1200
+  height: null
 
 collections:
-  - name: site
-    label: 网站内容
-    label_singular: 页面
-    description: 三屏落地页的全部文字和图片
+  - name: home
+    label: 首页
+    label_singular: 首页
+    description: 第一屏到最后屏的全部内容
+    editor:
+      # 预览面板加载的是「已部署的线上页面」，不是正在编辑的内容，
+      # 开着反而会让人以为没生效。关掉，发布后看线上即可。
+      preview: false
     files:
       - name: home
-        label: 首页
-        file: content/site.json
+        label: 首页内容
+        file: src/content/home.json
         format: json
         fields:
-          # ---------------- 品牌 ----------------
+          # ---------------- 品牌与导航 ----------------
           - label: 品牌
             name: brand
             widget: object
             collapsed: true
             fields:
               - { label: 品牌名, name: name, widget: string, hint: "顶栏左上角显示的名字" }
+
+          - label: 顶栏按钮
+            name: nav
+            widget: object
+            collapsed: true
+            fields:
+              - { label: 按钮文字, name: jumpLabel, widget: string, hint: "点一下跳到最后一屏（联系方式）。留空则不显示按钮" }
 
           # ---------------- SEO ----------------
           - label: 搜索引擎信息
@@ -59,52 +85,51 @@ collections:
             fields:
               - { label: 网页标题, name: title, widget: string, hint: "浏览器标签页显示的文字" }
               - { label: 网页描述, name: description, widget: text, hint: "搜索结果里的简介，建议 150 字以内" }
-              - { label: 分享标题, name: og_title, widget: string, hint: "发到 WhatsApp / Facebook 时的标题" }
-              - { label: 分享描述, name: og_description, widget: text }
-              - { label: 分享图片, name: og_image, widget: image, required: false }
+              - { label: 分享图片, name: ogImage, widget: image, required: false, hint: "发到 WhatsApp / Facebook 时的缩略图" }
 
-          # ---------------- 第 1 屏 ----------------
-          - label: 第 1 屏 · 手机壳
-            name: case
-            widget: object
-            collapsed: true
+          # ---------------- 商品屏（可增删排序） ----------------
+          - label: 商品展示屏
+            name: screens
+            widget: list
+            label_singular: 一屏
+            summary: "{{fields.kicker}} — {{fields.title}}"
+            hint: "点右下「+」加一屏，鼠标按住左侧手柄可拖动排序。建议 2～5 屏，最后一屏联系方式不用管，它永远在最后。"
             fields:
-              - { label: 小标题, name: kicker, widget: string }
+              - { label: 小标题, name: kicker, widget: string, hint: "例如 Nueva colección" }
               - { label: 大标题, name: title, widget: text, hint: "需要换行的地方按回车" }
               - { label: 副标题, name: subtitle, widget: text }
-              - { label: 三条卖点, name: bullets, widget: text, hint: "一行一条，显示为打勾列表" }
-              - { label: 按钮文字, name: cta, widget: string, hint: "默认 Buy Now" }
-              - { label: 按钮链接, name: link, widget: string, hint: "Mercado Libre 商品页地址" }
-              - { label: 产品图, name: image, widget: image, hint: "建议 1200×1600 PNG，透明底或白底" }
-              - { label: 产品图说明（alt）, name: image_alt, widget: string, hint: "给搜索引擎和读屏软件看的一句话" }
+              - { label: 卖点, name: bullets, widget: text, hint: "一行一条，页面上显示为打勾列表" }
+              - { label: 按钮文字, name: cta, widget: string, hint: "例如 Buy Now" }
+              - { label: 按钮链接, name: link, widget: string, hint: "商品页地址，留空则不显示按钮" }
+              - { label: 产品图, name: image, widget: image, hint: "建议竖版 3:4；上传后会自动转成 webp 并压到 1200 宽" }
+              - { label: 图片说明（alt）, name: imageAlt, widget: string, hint: "给搜索引擎和读屏软件看的一句话" }
+              - label: 图文左右
+                name: layout
+                widget: select
+                default: auto
+                options:
+                  - { label: 自动交替（按顺序）, value: auto }
+                  - { label: 文左图右, value: imageRight }
+                  - { label: 图左文右, value: imageLeft }
 
-          # ---------------- 第 2 屏 ----------------
-          - label: 第 2 屏 · 手机膜
-            name: film
-            widget: object
-            collapsed: true
-            fields:
-              - { label: 小标题, name: kicker, widget: string }
-              - { label: 大标题, name: title, widget: text, hint: "需要换行的地方按回车" }
-              - { label: 副标题, name: subtitle, widget: text }
-              - { label: 三条卖点, name: bullets, widget: text, hint: "一行一条，显示为打勾列表" }
-              - { label: 按钮文字, name: cta, widget: string }
-              - { label: 按钮链接, name: link, widget: string, hint: "可以先用手机壳的商品页" }
-              - { label: 产品图, name: image, widget: image, hint: "建议 1200×1600 PNG，透明底或白底" }
-              - { label: 产品图说明（alt）, name: image_alt, widget: string }
-
-          # ---------------- 第 3 屏 ----------------
-          - label: 第 3 屏 · 联系方式
+          # ---------------- 联系方式（固定最后一屏） ----------------
+          - label: 联系方式（最后一屏）
             name: contact
             widget: object
             collapsed: true
             fields:
               - { label: 小标题, name: kicker, widget: string, hint: "默认 Contacto" }
-              - { label: 电话号码, name: phone, widget: string, hint: "改成 +52 55 1234 5678 这种格式，拨号链接会自动生成" }
-              - { label: 服务时间, name: hours, widget: text, hint: "需要换行的地方按回车" }
+              - { label: 电话号码, name: phone, widget: string, hint: "例如 +52 55 1234 5678，拨号链接会自动生成" }
+              - { label: 营业时间, name: hours, widget: text, hint: "需要换行的地方按回车" }
               - { label: 打电话按钮文字, name: cta, widget: string, hint: "默认 Call Now" }
-              - { label: 二维码标题, name: qr_title, widget: string }
-              - { label: 二维码图片, name: qr_image, widget: image, hint: "600×600 PNG，黑白、四周留白" }
-              - { label: 二维码说明（alt）, name: qr_alt, widget: string }
+              - { label: 二维码标题, name: qrTitle, widget: string }
+              - label: 二维码图片
+                name: qrImage
+                widget: image
+                hint: "600×600 PNG，黑白、四周留白"
+                # 二维码不能压缩，压了可能扫不出来
+                media_processing:
+                  enabled: false
+              - { label: 二维码说明（alt）, name: qrAlt, widget: string }
               - { label: 二维码下方文字, name: website, widget: string, hint: "留空则不显示" }
-              - { label: 页脚版权说明, name: legal, widget: string, hint: "年份会自动更新，这里只写品牌和商标声明" }
+              - { label: 页脚版权, name: legal, widget: string, hint: "年份会自动生成，这里只写品牌和商标声明" }
