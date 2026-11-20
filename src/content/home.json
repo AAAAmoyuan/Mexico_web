@@ -12,17 +12,6 @@
   },
   "screens": [
     {
-      "layout": "imageRight",
-      "imageAlt": "Funda Robin color vino para iPhone 18 Pro con anillo MagSafe",
-      "cta": "Buy Now",
-      "bullets": "Anillo MagSafe con imán N56\nCristal antiamarilleo y botón de cámara preciso\nProtección 360° para cámara, pantalla y esquinas",
-      "kicker": "Nueva colección",
-      "subtitle": "Diseño transparente con anillo MagSafe, protector de cámara y resistencia a caídas de 3M.",
-      "title": "Funda para\niPhone 18 Pro",
-      "link": "https://www.mercadolibre.com.mx/funda-para-iphone-18-pro-con-protector-de-camara-y-magsafe/up/MLMU5112836898",
-      "image": "/uploads/case-product.png"
-    },
-    {
       "layout": "imageLeft",
       "imageAlt": "Protector de pantalla Robin de cristal templado",
       "cta": "Buy Now",
@@ -34,15 +23,15 @@
       "image": "/uploads/film-product.png"
     },
     {
-      "layout": "auto",
-      "imageAlt": "laijunke",
-      "cta": "laijunke",
-      "bullets": "laijunke",
-      "kicker": "laijunke",
-      "subtitle": "laijunke",
-      "title": "laijunke",
-      "link": "laijunke",
-      "image": "/uploads/a69220dd3efd4d3e8312719b6696fa2c20251117.png"
+      "layout": "imageRight",
+      "imageAlt": "Funda Robin color vino para iPhone 18 Pro con anillo MagSafe",
+      "cta": "Buy Now",
+      "bullets": "Anillo MagSafe con imán N56\nCristal antiamarilleo y botón de cámara preciso\nProtección 360° para cámara, pantalla y esquinas",
+      "kicker": "Nueva colección",
+      "subtitle": "Diseño transparente con anillo MagSafe, protector de cámara y resistencia a caídas de 3M.",
+      "title": "Funda para\niPhone 18 Pro",
+      "link": "https://www.mercadolibre.com.mx/funda-para-iphone-18-pro-con-protector-de-camara-y-magsafe/up/MLMU5112836898",
+      "image": "/uploads/case-product.png"
     }
   ],
   "contact": {
